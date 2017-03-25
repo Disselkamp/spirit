@@ -5,7 +5,7 @@
 
 #include <Eigen/Dense>
 
-#include <engine/Hamiltonian_Anisotropic.hpp>
+#include <engine/Hamiltonian_Heisenberg.hpp>
 #include <engine/Vectormath.hpp>
 #include <data/Spin_System.hpp>
 #include <utility/Constants.hpp>
@@ -18,7 +18,7 @@ using namespace Utility;
 
 namespace Engine
 {
-	Hamiltonian_Anisotropic::Hamiltonian_Anisotropic(
+	Hamiltonian_Heisenberg::Hamiltonian_Heisenberg(
 			scalarfield mu_s,
 			intfield external_field_index, scalarfield external_field_magnitude, vectorfield external_field_normal,
 			intfield anisotropy_index, scalarfield anisotropy_magnitude, vectorfield anisotropy_normal,
@@ -46,7 +46,7 @@ namespace Engine
 		this->Update_Energy_Contributions();
 	}
 
-	void Hamiltonian_Anisotropic::Update_Energy_Contributions()
+	void Hamiltonian_Heisenberg::Update_Energy_Contributions()
 	{
 		this->energy_contributions_per_spin = std::vector<std::pair<std::string, scalarfield>>(0);
 
@@ -95,7 +95,7 @@ namespace Engine
 	}
 
 
-	void Hamiltonian_Anisotropic::Energy_Contributions_per_Spin(const vectorfield & spins, std::vector<std::pair<std::string, scalarfield>> & contributions)
+	void Hamiltonian_Heisenberg::Energy_Contributions_per_Spin(const vectorfield & spins, std::vector<std::pair<std::string, scalarfield>> & contributions)
 	{
 		int nos = spins.size();
 		for (auto& pair : contributions)
@@ -155,7 +155,7 @@ namespace Engine
 			atomicAdd(&Energy[external_field_index[idx]], - external_field_magnitude[idx] * external_field_normal[idx].dot(spins[external_field_index[idx]]));
 		}
 	}
-	void Hamiltonian_Anisotropic::E_Zeeman(const vectorfield & spins, scalarfield & Energy)
+	void Hamiltonian_Heisenberg::E_Zeeman(const vectorfield & spins, scalarfield & Energy)
 	{
 		int size = this->external_field_index.size();
 		CU_E_Zeeman<<<(size+1023)/1024, 1024>>>(spins.data(), this->external_field_index.data(), this->external_field_magnitude.data(), this->external_field_normal.data(), Energy.data(), size);
@@ -171,7 +171,7 @@ namespace Engine
 			atomicAdd(&Energy[anisotropy_index[idx]], - anisotropy_magnitude[idx] * std::pow(anisotropy_normal[idx].dot(spins[anisotropy_index[idx]]), 2.0));
 		}
 	}
-	void Hamiltonian_Anisotropic::E_Anisotropy(const vectorfield & spins, scalarfield & Energy)
+	void Hamiltonian_Heisenberg::E_Anisotropy(const vectorfield & spins, scalarfield & Energy)
 	{
 		int size = this->anisotropy_index.size();
 		CU_E_Anisotropy<<<(size+1023)/1024, 1024>>>(spins.data(), this->anisotropy_index.data(), this->anisotropy_magnitude.data(), this->anisotropy_normal.data(), Energy.data(), size);
@@ -191,7 +191,7 @@ namespace Engine
 			atomicAdd(&Energy[jspin], sc);
 		}
 	}
-	void Hamiltonian_Anisotropic::E_Exchange(const vectorfield & spins, indexPairs & indices, scalarfield & J_ij, scalarfield & Energy)
+	void Hamiltonian_Heisenberg::E_Exchange(const vectorfield & spins, indexPairs & indices, scalarfield & J_ij, scalarfield & Energy)
 	{
 		int size = indices.size();
 		CU_E_Exchange<<<(size+1023)/1024, 1024>>>(spins.data(), indices.data(), J_ij.data(), Energy.data(), size);
@@ -211,14 +211,14 @@ namespace Engine
 			atomicAdd(&Energy[jspin], sc);
 		}
 	}
-	void Hamiltonian_Anisotropic::E_DMI(const vectorfield & spins, indexPairs & indices, scalarfield & DMI_magnitude, vectorfield & DMI_normal, scalarfield & Energy)
+	void Hamiltonian_Heisenberg::E_DMI(const vectorfield & spins, indexPairs & indices, scalarfield & DMI_magnitude, vectorfield & DMI_normal, scalarfield & Energy)
 	{
 		int size = indices.size();
 		CU_E_DMI<<<(size+1023)/1024, 1024>>>(spins.data(), indices.data(), DMI_magnitude.data(), DMI_normal.data(), Energy.data(), size);
 	}
 
 
-	void Hamiltonian_Anisotropic::E_DD(const vectorfield & spins, indexPairs & indices, scalarfield & DD_magnitude, vectorfield & DD_normal, scalarfield & Energy)
+	void Hamiltonian_Heisenberg::E_DD(const vectorfield & spins, indexPairs & indices, scalarfield & DD_magnitude, vectorfield & DD_normal, scalarfield & Energy)
 	{
 		//scalar mult = -Utility::Constants::mu_B*Utility::Constants::mu_B*1.0 / 4.0 / M_PI; // multiply with mu_B^2
 		scalar mult = 0.5*0.0536814951168; // mu_0*mu_B**2/(4pi*10**-30) -- the translations are in angstr�m, so the |r|[m] becomes |r|[m]*10^-10
@@ -237,7 +237,7 @@ namespace Engine
 	}// end DipoleDipole
 
 
-	void Hamiltonian_Anisotropic::E_Quadruplet(const vectorfield & spins, indexQuadruplets & indices, scalarfield & magnitude, scalarfield & Energy)
+	void Hamiltonian_Heisenberg::E_Quadruplet(const vectorfield & spins, indexQuadruplets & indices, scalarfield & magnitude, scalarfield & Energy)
 	{
 		for (unsigned int i_pair = 0; i_pair < indices.size(); ++i_pair)
 		{
@@ -250,7 +250,7 @@ namespace Engine
 
 
 
-	void Hamiltonian_Anisotropic::Gradient(const vectorfield & spins, vectorfield & gradient)
+	void Hamiltonian_Heisenberg::Gradient(const vectorfield & spins, vectorfield & gradient)
 	{
 		// Set to zero
 		Vectormath::fill(gradient, {0,0,0});
@@ -308,7 +308,7 @@ namespace Engine
 			}
 		}
 	}
-	void Hamiltonian_Anisotropic::Gradient_Zeeman(vectorfield & gradient)
+	void Hamiltonian_Heisenberg::Gradient_Zeeman(vectorfield & gradient)
 	{
 		int size = this->external_field_index.size();
 		CU_Gradient_Zeeman<<<(size+1023)/1024, 1024>>>( this->external_field_index.data(), this->external_field_magnitude.data(), this->external_field_normal.data(), gradient.data(), size );
@@ -329,7 +329,7 @@ namespace Engine
 			}
 		}
 	}
-	void Hamiltonian_Anisotropic::Gradient_Anisotropy(const vectorfield & spins, vectorfield & gradient)
+	void Hamiltonian_Heisenberg::Gradient_Anisotropy(const vectorfield & spins, vectorfield & gradient)
 	{
 		int size = this->anisotropy_index.size();
 		CU_Gradient_Anisotropy<<<(size+1023)/1024, 1024>>>( spins.data(), this->anisotropy_index.data(), this->anisotropy_magnitude.data(), this->anisotropy_normal.data(), gradient.data(), size );
@@ -351,7 +351,7 @@ namespace Engine
 			}
 		}
 	}
-	void Hamiltonian_Anisotropic::Gradient_Exchange(const vectorfield & spins, indexPairs & indices, scalarfield & J_ij, vectorfield & gradient)
+	void Hamiltonian_Heisenberg::Gradient_Exchange(const vectorfield & spins, indexPairs & indices, scalarfield & J_ij, vectorfield & gradient)
 	{
 		int size = indices.size();
 		CU_Gradient_Exchange<<<(size+1023)/1024, 1024>>>( spins.data(), indices.data(), J_ij.data(), gradient.data(), size );
@@ -375,14 +375,14 @@ namespace Engine
 			}
 		}
 	}
-	void Hamiltonian_Anisotropic::Gradient_DMI(const vectorfield & spins, indexPairs & indices, scalarfield & DMI_magnitude, vectorfield & DMI_normal, vectorfield & gradient)
+	void Hamiltonian_Heisenberg::Gradient_DMI(const vectorfield & spins, indexPairs & indices, scalarfield & DMI_magnitude, vectorfield & DMI_normal, vectorfield & gradient)
 	{
 		int size = indices.size();
 		CU_Gradient_DMI<<<(size+1023)/1024, 1024>>>( spins.data(), indices.data(), DMI_magnitude.data(), DMI_normal.data(), gradient.data(), size );
 	}
 
 
-	void Hamiltonian_Anisotropic::Gradient_DD(const vectorfield & spins, indexPairs & indices, scalarfield & DD_magnitude, vectorfield & DD_normal, vectorfield & gradient)
+	void Hamiltonian_Heisenberg::Gradient_DD(const vectorfield & spins, indexPairs & indices, scalarfield & DD_magnitude, vectorfield & DD_normal, vectorfield & gradient)
 	{
 		//scalar mult = Utility::Constants::mu_B*Utility::Constants::mu_B*1.0 / 4.0 / M_PI; // multiply with mu_B^2
 		scalar mult = 0.0536814951168; // mu_0*mu_B**2/(4pi*10**-30) -- the translations are in angstr�m, so the |r|[m] becomes |r|[m]*10^-10
@@ -399,7 +399,7 @@ namespace Engine
 	}//end Field_DipoleDipole
 
 
-	void Hamiltonian_Anisotropic::Gradient_Quadruplet(const vectorfield & spins, indexQuadruplets & indices, scalarfield & magnitude, vectorfield & gradient)
+	void Hamiltonian_Heisenberg::Gradient_Quadruplet(const vectorfield & spins, indexQuadruplets & indices, scalarfield & magnitude, vectorfield & gradient)
 	{
 		for (unsigned int i_pair = 0; i_pair < indices.size(); ++i_pair)
 		{
@@ -411,7 +411,7 @@ namespace Engine
 	}
 
 
-	void Hamiltonian_Anisotropic::Hessian(const vectorfield & spins, MatrixX & hessian)
+	void Hamiltonian_Heisenberg::Hessian(const vectorfield & spins, MatrixX & hessian)
 	{
 		int nos = spins.size();
 
@@ -538,8 +538,8 @@ namespace Engine
 	}
 
 	// Hamiltonian name as string
-	static const std::string name = "Anisotropic Heisenberg";
-	const std::string& Hamiltonian_Anisotropic::Name() { return name; }
+	static const std::string name = "Heisenberg Heisenberg";
+	const std::string& Hamiltonian_Heisenberg::Name() { return name; }
 }
 
 #endif

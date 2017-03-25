@@ -46,9 +46,9 @@ namespace Data
 
 		this->geometry = std::shared_ptr<Data::Geometry>(new Data::Geometry(*other.geometry));
 		
-		if (other.hamiltonian->Name() == "Anisotropic Heisenberg")
+		if (other.hamiltonian->Name() == "Heisenberg")
 		{
-			this->hamiltonian = std::shared_ptr<Engine::Hamiltonian>(new Engine::Hamiltonian_Anisotropic(*(Engine::Hamiltonian_Anisotropic*)(other.hamiltonian.get())));
+			this->hamiltonian = std::shared_ptr<Engine::Hamiltonian>(new Engine::Hamiltonian_Heisenberg(*(Engine::Hamiltonian_Heisenberg*)(other.hamiltonian.get())));
 		}
 		else if (other.hamiltonian->Name() == "Gaussian")
 		{
@@ -77,9 +77,9 @@ namespace Data
 
 			this->geometry = std::shared_ptr<Data::Geometry>(new Data::Geometry(*other.geometry));
 			
-			if (other.hamiltonian->Name() == "Anisotropic Heisenberg")
+			if (other.hamiltonian->Name() == "Heisenberg Heisenberg")
 			{
-				this->hamiltonian = std::shared_ptr<Engine::Hamiltonian>(new Engine::Hamiltonian_Anisotropic(*(Engine::Hamiltonian_Anisotropic*)(other.hamiltonian.get())));
+				this->hamiltonian = std::shared_ptr<Engine::Hamiltonian>(new Engine::Hamiltonian_Heisenberg(*(Engine::Hamiltonian_Heisenberg*)(other.hamiltonian.get())));
 			}
 			else if (other.hamiltonian->Name() == "Gaussian")
 			{

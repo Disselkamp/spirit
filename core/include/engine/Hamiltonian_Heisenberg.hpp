@@ -1,6 +1,6 @@
 #pragma once
-#ifndef HAMILTONIAN_ANISOTROPIC_NEW_H
-#define HAMILTONIAN_ANISOTROPIC_NEW_H
+#ifndef HAMILTONIAN_HEISENBERG_H
+#define HAMILTONIAN_HEISENBERG_H
 
 #include <vector>
 
@@ -12,14 +12,14 @@
 namespace Engine
 {
 	/*
-		The Anisotropic Hamiltonian contains all information on the interactions between spins.
+		The Heisenberg Hamiltonian contains all information on the interactions between spins.
 		The information is presented in index lists and parameter lists in order to easily calculate the energy of the system via summation.
 	*/
-	class Hamiltonian_Anisotropic : public Hamiltonian
+	class Hamiltonian_Heisenberg : public Hamiltonian
 	{
 	public:
 		// Constructor
-		Hamiltonian_Anisotropic(
+		Hamiltonian_Heisenberg(
 			scalarfield mu_s,
 			intfield external_field_index, scalarfield external_field_magnitude, vectorfield external_field_normal,
 			intfield anisotropy_index, scalarfield anisotropy_magnitude, vectorfield anisotropy_normal,

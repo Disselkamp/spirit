@@ -17,7 +17,7 @@
 #include <data/Parameters_Method_LLG.hpp>
 #include <data/Parameters_Method_GNEB.hpp>
 #include <data/Parameters_Method_MMF.hpp>
-#include <engine/Hamiltonian_Anisotropic.hpp>
+#include <engine/Hamiltonian_Heisenberg.hpp>
 #include <engine/Hamiltonian_Gaussian.hpp>
 
 
@@ -55,7 +55,7 @@ namespace Utility
 		std::unique_ptr<Data::Parameters_Method_GNEB> Parameters_Method_GNEB_from_Config(const std::string configFile);
 		std::unique_ptr<Data::Parameters_Method_MMF> Parameters_Method_MMF_from_Config(const std::string configFile);
 		std::unique_ptr<Engine::Hamiltonian> Hamiltonian_from_Config(const std::string configFile, std::shared_ptr<Data::Geometry> geometry);
-		std::unique_ptr<Engine::Hamiltonian_Anisotropic> Hamiltonian_Anisotropic_from_Config(const std::string configFile, std::shared_ptr<Data::Geometry> geometry);
+		std::unique_ptr<Engine::Hamiltonian_Heisenberg> Hamiltonian_Heisenberg_from_Config(const std::string configFile, std::shared_ptr<Data::Geometry> geometry);
 		std::unique_ptr<Engine::Hamiltonian_Gaussian> Hamiltonian_Gaussian_from_Config(const std::string configFile, std::shared_ptr<Data::Geometry> geometry);
 
 		// ======================== Configwriter ========================
@@ -69,7 +69,7 @@ namespace Utility
 		void Parameters_Method_GNEB_to_Config(const std::string configFile, std::shared_ptr<Data::Parameters_Method_GNEB> parameters);
 		void Parameters_Method_MMF_to_Config(const std::string configFile, std::shared_ptr<Data::Parameters_Method_MMF> parameters);
 		void Hamiltonian_to_Config(const std::string configFile, std::shared_ptr<Engine::Hamiltonian> hamiltonian, const std::shared_ptr<Data::Geometry> geometry);
-		void Hamiltonian_Anisotropic_to_Config(const std::string configFile, std::shared_ptr<Engine::Hamiltonian> hamiltonian, const std::shared_ptr<Data::Geometry> geometry);
+		void Hamiltonian_Heisenberg_to_Config(const std::string configFile, std::shared_ptr<Engine::Hamiltonian> hamiltonian, const std::shared_ptr<Data::Geometry> geometry);
 		void Hamiltonian_Gaussian_to_Config(const std::string configFile, std::shared_ptr<Engine::Hamiltonian> hamiltonian);
 
 		// ========================= Fileparser =========================

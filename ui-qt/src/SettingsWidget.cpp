@@ -62,7 +62,7 @@ SettingsWidget::SettingsWidget(std::shared_ptr<State> state, SpinWidget *spinWid
 
 	// Setup Interactions Tab
 	std::string H_name = Hamiltonian_Get_Name(state.get());
-	if (H_name == "Anisotropic Heisenberg") this->tabWidget_Settings->removeTab(2);
+	if (H_name == "Heisenberg") this->tabWidget_Settings->removeTab(2);
 	else
 	{
 		this->tabWidget_Settings->removeTab(2);
@@ -76,7 +76,7 @@ SettingsWidget::SettingsWidget(std::shared_ptr<State> state, SpinWidget *spinWid
 	// Connect slots
 	this->Setup_Configurations_Slots();
 	this->Setup_Transitions_Slots();
-	this->Setup_Hamiltonian_Anisotropic_Slots();
+	this->Setup_Hamiltonian_Heisenberg_Slots();
 	this->Setup_Parameters_Slots();
 	this->Setup_Visualization_Slots();
 }
@@ -85,7 +85,7 @@ void SettingsWidget::updateData()
 {
 	// Load Hamiltonian Contents
 	std::string H_name = Hamiltonian_Get_Name(state.get());
-	if (H_name == "Anisotropic Heisenberg") this->Load_Hamiltonian_Anisotropic_Contents();
+	if (H_name == "Heisenberg") this->Load_Hamiltonian_Heisenberg_Contents();
 	// Load Parameters Contents
 	this->Load_Parameters_Contents();
 	// ToDo: Also update Debug etc!
@@ -422,7 +422,7 @@ void SettingsWidget::Load_Parameters_Contents()
 }
 
 
-void SettingsWidget::Load_Hamiltonian_Anisotropic_Contents()
+void SettingsWidget::Load_Hamiltonian_Heisenberg_Contents()
 {
 	float d, vd[3], mu_s;
 
@@ -1071,7 +1071,7 @@ void SettingsWidget::set_hamiltonian_aniso_stt()
 	{
 		float d, vd[3];
 
-		// TODO: Make these anisotropic for Anisotropic Hamiltonian
+		// TODO: Make these anisotropic for Heisenberg Hamiltonian
 		//		 or move them to Parameters...
 		// Spin polarised current
 		if (this->checkBox_stt_aniso->isChecked())
@@ -1661,7 +1661,7 @@ void SettingsWidget::print_Energies_to_console()
 // --------------------- Setup functions for Slots and Validators --------------------
 // -----------------------------------------------------------------------------------
 
-void SettingsWidget::Setup_Hamiltonian_Anisotropic_Slots()
+void SettingsWidget::Setup_Hamiltonian_Heisenberg_Slots()
 {
 	// Boundary Conditions
 	connect(this->checkBox_aniso_periodical_a, SIGNAL(stateChanged(int)), this, SLOT(set_hamiltonian_aniso_bc()));
@@ -1873,7 +1873,7 @@ void SettingsWidget::Setup_Input_Validators()
 	//		temperature
 	this->lineEdit_temper->setValidator(this->number_validator_unsigned);
 
-	// Anisotropic Hamiltonian
+	// Heisenberg Hamiltonian
 	//		mu_s
 	this->lineEdit_muSpin_aniso->setValidator(this->number_validator);
 	//		external field
