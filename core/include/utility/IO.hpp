@@ -81,10 +81,10 @@ namespace Utility
 			intfield & anisotropy_index, scalarfield & anisotropy_magnitude,
 			vectorfield & anisotropy_normal);
 		void Pairs_from_File(const std::string pairsFile, const std::shared_ptr<Data::Geometry> geometry, int & nop,
-			std::vector<pairfield> & Exchange_indices, std::vector<scalarfield> & Exchange_magnitude,
-			std::vector<pairfield> & DMI_indices, std::vector<scalarfield> & DMI_magnitude, std::vector<vectorfield> & DMI_normal);
+			pairfield & Exchange_indices, scalarfield & Exchange_magnitude,
+			pairfield & DMI_indices, scalarfield & DMI_magnitude, vectorfield & DMI_normal);
 		void Quadruplets_from_File(const std::string quadrupletsFile, const std::shared_ptr<Data::Geometry> geometry, int & noq,
-			std::vector<quadrupletfield> & quadruplet_indices, std::vector<scalarfield> & quadruplet_magnitude);
+			quadrupletfield & quadruplet_indices, scalarfield & quadruplet_magnitude);
 
 		// =========================== Saving Configurations ===========================
 		// Append Spin_Configuration to file

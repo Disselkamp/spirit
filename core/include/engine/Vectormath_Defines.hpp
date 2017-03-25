@@ -5,6 +5,7 @@
 #include <Eigen/Core>
 
 #include <vector>
+#include <array>
 
 #include "Spirit_Defines.h"
 
@@ -55,7 +56,7 @@ typedef Eigen::Matrix<scalar, 3, 3> Matrix3;
     struct Pair
     {
         int i, j;
-        intfield translations;
+        std::array<int,3> translations;
     };
     struct Triplet
     {
@@ -66,9 +67,7 @@ typedef Eigen::Matrix<scalar, 3, 3> Matrix3;
     struct Quadruplet
     {
         int i, j, k, l;
-        int da_j, db_j, dc_j;
-        int da_k, db_k, dc_k;
-        int da_l, db_l, dc_l;
+        std::array<int,3> d_j, d_k, d_l;
     };
     typedef std::vector<Pair>       pairfield;
     typedef std::vector<Triplet>    tripletfield;

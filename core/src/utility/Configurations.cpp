@@ -23,7 +23,8 @@ namespace Utility
 	{
 		void Move(vectorfield& configuration, const Data::Geometry & geometry, int da, int db, int dc)
 		{
-			int delta = geometry.n_spins_basic_domain*da + geometry.n_spins_basic_domain*geometry.n_cells[0] * db + geometry.n_spins_basic_domain*geometry.n_cells[0] * geometry.n_cells[1] * dc;
+			int N = geometry.n_spins_basic_domain[0];
+			int delta = N*da + N*geometry.n_cells[0] * db + N*geometry.n_cells[0] * geometry.n_cells[1] * dc;
 			if (delta < 0)
 				delta += geometry.nos;
 			std::rotate(configuration.begin(), configuration.begin() + delta, configuration.end());

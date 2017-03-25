@@ -190,7 +190,7 @@ namespace Utility
 		/*
 		Read from Anisotropy file
 		*/
-		void Anisotropy_from_File(const std::string anisotropyFile, Data::Geometry geometry, int & n_indices,
+		void Anisotropy_from_File(const std::string anisotropyFile, std::shared_ptr<Data::Geometry> geometry, int & n_indices,
 			intfield & anisotropy_index, scalarfield & anisotropy_magnitude,
 			vectorfield & anisotropy_normal)
 		{
@@ -272,9 +272,9 @@ namespace Utility
 					// Anisotropy vector orientation
 					if (K_abc)
 					{
-						spin_K1 = K_temp.dot(geometry.basis[0]);
-						spin_K2 = K_temp.dot(geometry.basis[1]);
-						spin_K3 = K_temp.dot(geometry.basis[2]);
+						spin_K1 = K_temp.dot(geometry->basis[0]);
+						spin_K2 = K_temp.dot(geometry->basis[1]);
+						spin_K3 = K_temp.dot(geometry->basis[2]);
 					}
 					// Anisotropy vector normalisation
 					if (K_magnitude)
@@ -318,9 +318,9 @@ namespace Utility
 		/*
 		Read from Pairs file by Markus & Bernd
 		*/
-		void Pairs_from_File(const std::string pairsFile, Data::Geometry geometry, int & nop,
-			std::vector<pairfield> & Exchange_indices, std::vector<scalarfield> & Exchange_magnitude,
-			std::vector<pairfield> & DMI_indices, std::vector<scalarfield> & DMI_magnitude, std::vector<vectorfield> & DMI_normal)
+		void Pairs_from_File(const std::string pairsFile, const std::shared_ptr<Data::Geometry> geometry, int & nop,
+			pairfield & Exchange_pairs, scalarfield & Exchange_magnitude,
+			pairfield & DMI_pairs, scalarfield & DMI_magnitude, vectorfield & DMI_normal)
 		{
 			Log(Log_Level::Info, Log_Sender::IO, "Reading spin pairs from file " + pairsFile);
 			try {
@@ -416,9 +416,9 @@ namespace Utility
 					if (DMI_abc)
 					{
 						pair_D_temp = { pair_D1, pair_D2, pair_D3 };
-						pair_D1 = pair_D_temp.dot(geometry.basis[0]);
-						pair_D2 = pair_D_temp.dot(geometry.basis[1]);
-						pair_D3 = pair_D_temp.dot(geometry.basis[2]);
+						pair_D1 = pair_D_temp.dot(geometry->basis[0]);
+						pair_D2 = pair_D_temp.dot(geometry->basis[1]);
+						pair_D3 = pair_D_temp.dot(geometry->basis[2]);
 					}
 					// DMI vector normalisation
 					if (Dij)
@@ -445,93 +445,23 @@ namespace Utility
 
 					// Create all Pairs of this Kind through translation
 					int idx_i = 0, idx_j = 0;
-					int Na = geometry.n_cells[0];
-					int Nb = geometry.n_cells[1];
-					int Nc = geometry.n_cells[2];
-					int N = geometry.n_spins_basic_domain;
-					int periods_a = 0, periods_b = 0, periods_c = 0;
-					for (int na = 0; na < Na; ++na)
+					int Na = geometry->n_cells[0];
+					int Nb = geometry->n_cells[1];
+					int Nc = geometry->n_cells[2];
+					int N = geometry->n_spins_basic_domain[0];
+
+					// Add the indices and parameters to the corresponding lists
+					if (pair_Jij != 0)
 					{
-						for (int nb = 0; nb < Nb; ++nb)
-						{
-							for (int nc = 0; nc < Nc; ++nc)
-							{
-								idx_i = pair_i + N*na + N*Na*nb + N*Na*Nb*nc;
-								// na + pair_da is absolute position of cell in x direction
-								// if (na + pair_da) > Na (number of atoms in x)
-								// go to the other side with % Na
-								// if (na + pair_da) negative (or multiply (of Na) negative)
-								// add Na and modulo again afterwards
-								// analogous for y and z direction with nb, nc
-								periods_a = (na + pair_da) / Na;
-								periods_b = (nb + pair_db) / Nb;
-								periods_c = (nc + pair_dc) / Nc;
-
-								// Catch cases of negative periodicity
-								if (na + pair_da < 0) periods_a = -1;
-								if (nb + pair_db < 0) periods_b = -1;
-								if (nc + pair_dc < 0) periods_c = -1;
-
-								idx_j = pair_j	+ N*( (((na + pair_da) % Na) + Na) % Na )
-												+ N*Na*( (((nb + pair_db) % Nb) + Nb) % Nb )
-												+ N*Na*Nb*( (((nc + pair_dc) % Nc) + Nc) % Nc );
-								// Determine the periodicity
-								//		none
-								if (periods_a == 0 && periods_b == 0 && periods_c == 0)
-								{
-									pair_periodicity = 0;
-								}
-								//		a
-								else if (periods_a != 0 && periods_b == 0 && periods_c == 0)
-								{
-									pair_periodicity = 1;
-								}
-								//		b
-								else if (periods_a == 0 && periods_b != 0 && periods_c == 0)
-								{
-									pair_periodicity = 2;
-								}
-								//		c
-								else if (periods_a == 0 && periods_b == 0 && periods_c != 0)
-								{
-									pair_periodicity = 3;
-								}
-								//		ab
-								else if (periods_a != 0 && periods_b != 0 && periods_c == 0)
-								{
-									pair_periodicity = 4;
-								}
-								//		ac
-								else if (periods_a != 0 && periods_b == 0 && periods_c != 0)
-								{
-									pair_periodicity = 5;
-								}
-								//		bc
-								else if (periods_a == 0 && periods_b != 0 && periods_c != 0)
-								{
-									pair_periodicity = 6;
-								}
-								//		abc
-								else if (periods_a != 0 && periods_b != 0 && periods_c != 0)
-								{
-									pair_periodicity = 7;
-								}
-
-								// Add the indices and parameters to the corresponding lists
-								if (pair_Jij != 0)
-								{
-									Exchange_indices[pair_periodicity].push_back(pairfield{ idx_i, idx_j });
-									Exchange_magnitude[pair_periodicity].push_back(pair_Jij);
-								}
-								if (pair_Dij != 0)
-								{
-									DMI_indices[pair_periodicity].push_back(pairfield{ idx_i, idx_j });
-									DMI_magnitude[pair_periodicity].push_back(pair_Dij);
-									DMI_normal[pair_periodicity].push_back(Vector3{pair_D1, pair_D2, pair_D3});
-								}
-							}
-						}
-					}// end for translations
+						Exchange_pairs.push_back(Pair{ pair_i, pair_j, {pair_da, pair_db, pair_dc} });
+						Exchange_magnitude.push_back(pair_Jij);
+					}
+					if (pair_Dij != 0)
+					{
+						DMI_pairs.push_back(Pair{ pair_i, pair_j, {pair_da, pair_db, pair_dc} });
+						DMI_magnitude.push_back(pair_Dij);
+						DMI_normal.push_back(Vector3{pair_D1, pair_D2, pair_D3});
+					}
 
 					++i_pair;
 				}// end while GetLine
@@ -551,8 +481,8 @@ namespace Utility
 		/*
 		Read from Quadruplet file
 		*/
-		void Quadruplets_from_File(const std::string quadrupletsFile, Data::Geometry geometry, int & noq,
-			std::vector<quadrupletfield> & quadruplet_indices, std::vector<scalarfield> & quadruplet_magnitude)
+		void Quadruplets_from_File(const std::string quadrupletsFile, const std::shared_ptr<Data::Geometry> geometry,
+			int & noq, quadrupletfield & quadruplet_pairs, scalarfield & quadruplet_magnitude)
 		{
 			Log(Log_Level::Info, Log_Sender::IO, "Reading spin quadruplets from file " + quadrupletsFile);
 			try {
@@ -653,118 +583,20 @@ namespace Utility
 					}// end for columns
 					
 
-					auto periodicity = [] (int periods_a, int periods_b, int periods_c) -> int
-					{
-						// Determine the periodicity
-						//		none
-						if (periods_a == 0 && periods_b == 0 && periods_c == 0)
-						{
-							return 0;
-						}
-						//		a
-						else if (periods_a != 0 && periods_b == 0 && periods_c == 0)
-						{
-							return 1;
-						}
-						//		b
-						else if (periods_a == 0 && periods_b != 0 && periods_c == 0)
-						{
-							return 2;
-						}
-						//		c
-						else if (periods_a == 0 && periods_b == 0 && periods_c != 0)
-						{
-							return 3;
-						}
-						//		ab
-						else if (periods_a != 0 && periods_b != 0 && periods_c == 0)
-						{
-							return 4;
-						}
-						//		ac
-						else if (periods_a != 0 && periods_b == 0 && periods_c != 0)
-						{
-							return 5;
-						}
-						//		bc
-						else if (periods_a == 0 && periods_b != 0 && periods_c != 0)
-						{
-							return 6;
-						}
-						//		abc
-						else if (periods_a != 0 && periods_b != 0 && periods_c != 0)
-						{
-							return 7;
-						}
-						else return 0;
-					};
-
+					
 					// Create all Pairs of this Kind through translation
 					int idx_i = 0, idx_j = 0, idx_k = 0, idx_l = 0;
-					int Na = geometry.n_cells[0];
-					int Nb = geometry.n_cells[1];
-					int Nc = geometry.n_cells[2];
-					int N = geometry.n_spins_basic_domain;
-					int periods_a_j = 0, periods_b_j = 0, periods_c_j = 0;
-					int periods_a_k = 0, periods_b_k = 0, periods_c_k = 0;
-					int periods_a_l = 0, periods_b_l = 0, periods_c_l = 0;
-					for (int na = 0; na < Na; ++na)
+					int Na = geometry->n_cells[0];
+					int Nb = geometry->n_cells[1];
+					int Nc = geometry->n_cells[2];
+					int N = geometry->n_spins_basic_domain[0];
+					
+					// Add the indices and parameter to the corresponding list
+					if (q_Q != 0)
 					{
-						for (int nb = 0; nb < Nb; ++nb)
-						{
-							for (int nc = 0; nc < Nc; ++nc)
-							{
-								idx_i = q_i + N*na + N*Na*nb + N*Na*Nb*nc;
-								// na + pair_da is absolute position of cell in x direction
-								// if (na + pair_da) > Na (number of atoms in x)
-								// go to the other side with % Na
-								// if (na + pair_da) negative (or multiply (of Na) negative)
-								// add Na and modulo again afterwards
-								// analogous for y and z direction with nb, nc
-
-								// j
-								periods_a_j = (na + q_da_j) / Na;
-								periods_b_j = (nb + q_db_j) / Nb;
-								periods_c_j = (nc + q_dc_j) / Nc;
-								idx_j = q_j	+ N*( (((na + q_da_j) % Na) + Na) % Na )
-											+ N*Na*( (((nb + q_db_j) % Nb) + Nb) % Nb )
-											+ N*Na*Nb*( (((nc + q_dc_j) % Nc) + Nc) % Nc );
-
-								// k
-								periods_a_k = (na + q_da_k) / Na;
-								periods_b_k = (nb + q_db_k) / Nb;
-								periods_c_k = (nc + q_dc_k) / Nc;
-								idx_k = q_k	+ N*( (((na + q_da_k) % Na) + Na) % Na )
-											+ N*Na*( (((nb + q_db_k) % Nb) + Nb) % Nb )
-											+ N*Na*Nb*( (((nc + q_dc_k) % Nc) + Nc) % Nc );
-								
-								// l
-								periods_a_l = (na + q_da_l) / Na;
-								periods_b_l = (nb + q_db_l) / Nb;
-								periods_c_l = (nc + q_dc_l) / Nc;
-								idx_l = q_l	+ N*( (((na + q_da_l) % Na) + Na) % Na )
-											+ N*Na*( (((nb + q_db_l) % Nb) + Nb) % Nb )
-											+ N*Na*Nb*( (((nc + q_dc_l) % Nc) + Nc) % Nc );
-
-								// Periodicity
-								// periodicity_j = periodicity(periods_a_j, periods_b_j, periods_c_j)
-								// periodicity_k = periodicity(periods_a_k, periods_b_k, periods_c_k)
-								// periodicity_l = periodicity(periods_a_l, periods_b_l, periods_c_l)
-								max_periods_a = std::max({periods_a_j, periods_a_k, periods_a_l});
-								max_periods_b = std::max({periods_b_j, periods_b_k, periods_b_l});
-								max_periods_c = std::max({periods_c_j, periods_c_k, periods_c_l});
-								quadruplet_periodicity = periodicity(max_periods_a, max_periods_b, max_periods_c);
-								
-
-								// Add the indices and parameter to the corresponding list
-								if (q_Q != 0)
-								{
-									quadruplet_indices[quadruplet_periodicity].push_back(quadrupletfield{ idx_i, idx_j, idx_k, idx_l });
-									quadruplet_magnitude[quadruplet_periodicity].push_back(q_Q);
-								}
-							}
-						}
-					}// end for translations
+						quadruplet_pairs.push_back(Quadruplet{ idx_i, idx_j, idx_k, idx_l, {q_da_j, q_db_j, q_dc_j}, {q_da_k, q_db_k, q_dc_k}, {q_da_l, q_db_l, q_dc_l} });
+						quadruplet_magnitude.push_back(q_Q);
+					}
 
 					++i_quadruplet;
 				}// end while GetLine

@@ -18,26 +18,35 @@ using namespace Utility;
 
 namespace Engine
 {
-	inline bool boundary_conditions_fulfilled(const intfield & n_cells, const boolfield & boundary_conditions, const intfield & translations_i, const intfield & translations_j)
+	inline bool boundary_conditions_fulfilled(const intfield & n_cells, const boolfield & boundary_conditions, const std::array<int,3> & translations_i, const std::array<int,3> & translations_j)
 	{
 		return  (boundary_conditions[0] || translations_i[0]+translations_j[0] < n_cells[0]) &&
 				(boundary_conditions[1] || translations_i[1]+translations_j[1] < n_cells[1]) &&
 				(boundary_conditions[2] || translations_i[2]+translations_j[2] < n_cells[2]);
 	}
 
-	inline int idx_from_translations(const intfield & n_cells, const intfield & n_spins_basic_domain, const intfield & translations)
+	inline int idx_from_translations(const intfield & n_cells, const intfield & n_spins_basic_domain, const std::array<int,3> & translations)
 	{
 		int Na = n_cells[0];
 		int Nb = n_cells[1];
 		int Nc = n_cells[2];
 		int N  = n_spins_basic_domain[0];
 		
-		return translations[0]*N + translations[1]*N*Na + translations[2]*N*Na*Nb;
+		int idx = translations[0]*N + translations[1]*N*Na + translations[2]*N*Na*Nb;
+		
+		if (translations[0] < 0)
+			idx += N*Na;
+		if (translations[1] < 0)
+			idx += N*Na*Nb;
+		if (translations[2] < 0)
+			idx += N*Na*Nb*Nc;
+
+		return idx;
 	}
 
-	inline intfield translations_from_idx(const intfield & n_cells, const intfield & n_spins_basic_domain, int idx)
+	inline std::array<int,3> translations_from_idx(const intfield & n_cells, const intfield & n_spins_basic_domain, int idx)
 	{
-		intfield ret(3);
+		std::array<int,3> ret;
 		int Na = n_cells[0];
 		int Nb = n_cells[1];
 		int Nc = n_cells[2];

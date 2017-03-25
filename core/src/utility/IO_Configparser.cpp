@@ -574,9 +574,9 @@ namespace Utility
 			int n_pairs = 0;
 			std::string interaction_pairs_file = "";
 			bool interaction_pairs_from_file = false;
-			std::vector<pairfield> Exchange_indices(8); std::vector<scalarfield> Exchange_magnitude(8);
-			std::vector<pairfield> DMI_indices(8); std::vector<scalarfield> DMI_magnitude(8); std::vector<vectorfield> DMI_normal(8);
-			std::vector<pairfield> DD_indices(8); std::vector<scalarfield> DD_magnitude(8); std::vector<vectorfield> DD_normal(8);
+			pairfield Exchange_pairs; scalarfield Exchange_magnitude;
+			pairfield DMI_pairs; scalarfield DMI_magnitude; vectorfield DMI_normal;
+			pairfield DD_pairs; scalarfield DD_magnitude; vectorfield DD_normal;
 
 			scalar dd_radius = 0.0;
 
@@ -584,7 +584,7 @@ namespace Utility
 			int n_quadruplets = 0;
 			std::string quadruplets_file = "";
 			bool quadruplets_from_file = false;
-			std::vector<quadrupletfield> quadruplet_indices(8); std::vector<scalarfield> quadruplet_magnitude(8);
+			quadrupletfield quadruplets; scalarfield quadruplet_magnitude;
 
 			//------------------------------- Parser --------------------------------
 			Log(Log_Level::Info, Log_Sender::IO, "Hamiltonian_Heisenberg: building");
@@ -694,8 +694,8 @@ namespace Utility
 					{
 						// The file name should be valid so we try to read it
 						Pairs_from_File(interaction_pairs_file, geometry, n_pairs,
-							Exchange_indices, Exchange_magnitude,
-							DMI_indices, DMI_magnitude, DMI_normal);
+							Exchange_pairs, Exchange_magnitude,
+							DMI_pairs, DMI_magnitude, DMI_normal);
 					}
 					//else
 					//{
@@ -719,10 +719,10 @@ namespace Utility
 					// // Create the DD neighbours
 					// Engine::Neighbours::Create_Dipole_Neighbours(geometry, std::vector<bool>{ true, true, true }, dd_radius, dd_neigh, dd_neigh_pos, dd_normal, dd_distance);
 					// // Get the DD pairs from the neighbours
-					// Engine::Neighbours::Create_DD_Pairs_from_Neighbours(geometry, dd_neigh, dd_neigh_pos, dd_distance, dd_normal, DD_indices, DD_magnitude, DD_normal);
+					// Engine::Neighbours::Create_DD_Pairs_from_Neighbours(geometry, dd_neigh, dd_neigh_pos, dd_distance, dd_normal, DD_pairs, DD_magnitude, DD_normal);
 					
 					
-					Engine::Neighbours::Create_Dipole_Pairs(*geometry, dd_radius, DD_indices, DD_magnitude, DD_normal);
+					// Engine::Neighbours::Create_Dipole_Pairs(*geometry, dd_radius, DD_pairs, DD_magnitude, DD_normal);
 
 
 					// Interaction Quadruplets
@@ -731,7 +731,7 @@ namespace Utility
 					{
 						// The file name should be valid so we try to read it
 						Quadruplets_from_File(quadruplets_file, geometry, n_quadruplets,
-							quadruplet_indices, quadruplet_magnitude);
+							quadruplets, quadruplet_magnitude);
 					}
 
 				}// end try
@@ -758,10 +758,10 @@ namespace Utility
 				mu_s,
 				external_field_index, external_field_magnitude, external_field_normal,
 				anisotropy_index, anisotropy_magnitude, anisotropy_normal,
-				Exchange_indices, Exchange_magnitude,
-				DMI_indices, DMI_magnitude, DMI_normal,
-				DD_indices, DD_magnitude, DD_normal,
-				quadruplet_indices, quadruplet_magnitude,
+				Exchange_pairs, Exchange_magnitude,
+				DMI_pairs, DMI_magnitude, DMI_normal,
+				DD_pairs, DD_magnitude, DD_normal,
+				quadruplets, quadruplet_magnitude,
 				geometry,
 				boundary_conditions
 			));

@@ -52,8 +52,8 @@ namespace Utility
 			config += std::to_string(geometry->basis[0][0]) + " " + std::to_string(geometry->basis[0][1]) + " " + std::to_string(geometry->basis[0][2]) + "\n";
 			config += std::to_string(geometry->basis[1][0]) + " " + std::to_string(geometry->basis[1][1]) + " " + std::to_string(geometry->basis[1][2]) + "\n";
 			config += std::to_string(geometry->basis[2][0]) + " " + std::to_string(geometry->basis[2][1]) + " " + std::to_string(geometry->basis[2][2]) + "\n";
-			config += std::to_string(geometry->n_spins_basic_domain) + "\n";
-			for (int i=0; i<geometry->n_spins_basic_domain; ++i)
+			config += std::to_string(geometry->n_spins_basic_domain[0]) + "\n";
+			for (int i=0; i<geometry->n_spins_basic_domain[0]; ++i)
 			{
 				config += std::to_string(geometry->basis_atoms[i][0]) + " " + std::to_string(geometry->basis_atoms[i][1]) + " " + std::to_string(geometry->basis_atoms[i][2]) + "\n";
 			}
@@ -152,7 +152,7 @@ namespace Utility
 			
 			// Magnetic moment
 			config += "mu_s                     ";
-			for (int i=0; i<geometry->n_spins_basic_domain; ++i)
+			for (int i=0; i<geometry->n_spins_basic_domain[0]; ++i)
 				config += std::to_string(ham_aniso->mu_s[i]);
 			config += "\n";
 
