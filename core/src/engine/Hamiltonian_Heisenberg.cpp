@@ -289,19 +289,33 @@ namespace Engine
 
 	void Hamiltonian_Heisenberg::Gradient_Exchange(const vectorfield & spins, vectorfield & gradient)
 	{
-		for (unsigned int i_pair = 0; i_pair < Exchange_pairs.size(); ++i_pair)
+		for (unsigned int ispin = 0; ispin < spins.size(); ++ispin)
 		{
-			// gradient[pairs[i_pair][0]] -= Exchange_magnitude[i_pair] * spins[pairs[i_pair][1]];
-			// gradient[pairs[i_pair][1]] -= Exchange_magnitude[i_pair] * spins[pairs[i_pair][0]];
+			auto translations = translations_from_idx(geometry->n_cells, geometry->n_spins_basic_domain, ispin);
+			for (unsigned int i_pair = 0; i_pair < Exchange_pairs.size(); ++i_pair)
+			{
+				if ( boundary_conditions_fulfilled(geometry->n_cells, boundary_conditions, translations, Exchange_pairs[i_pair].translations) )
+				{
+					int jspin = ispin + idx_from_translations(geometry->n_cells, geometry->n_spins_basic_domain, translations);
+					gradient[ispin] -= Exchange_magnitude[i_pair] * spins[jspin];
+				}
+			}
 		}
 	}
 
 	void Hamiltonian_Heisenberg::Gradient_DMI(const vectorfield & spins, vectorfield & gradient)
 	{
-		for (unsigned int i_pair = 0; i_pair < DMI_pairs.size(); ++i_pair)
+		for (unsigned int ispin = 0; ispin < spins.size(); ++ispin)
 		{
-			// gradient[pairs[i_pair][0]] -= DMI_magnitude[i_pair] * spins[pairs[i_pair][1]].cross(DMI_normal[i_pair]);
-			// gradient[pairs[i_pair][1]] += DMI_magnitude[i_pair] * spins[pairs[i_pair][0]].cross(DMI_normal[i_pair]);
+			auto translations = translations_from_idx(geometry->n_cells, geometry->n_spins_basic_domain, ispin);
+			for (unsigned int i_pair = 0; i_pair < DMI_pairs.size(); ++i_pair)
+			{
+				if ( boundary_conditions_fulfilled(geometry->n_cells, boundary_conditions, translations, DMI_pairs[i_pair].translations) )
+				{
+					int jspin = ispin + idx_from_translations(geometry->n_cells, geometry->n_spins_basic_domain, translations);
+					gradient[ispin] -= DMI_magnitude[i_pair] * spins[jspin].cross(DMI_normal[i_pair]);
+				}
+			}
 		}
 	}
 

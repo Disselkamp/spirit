@@ -536,7 +536,9 @@ namespace Utility
 			}
 			else
 			{
-				Log(Log_Level::Error, Log_Sender::IO, "Hamiltonian: Invalid type: " + hamiltonian_type);
+				Log(Log_Level::Severe, Log_Sender::IO, "Hamiltonian: Invalid type: " + hamiltonian_type);
+				Log.Append_to_File();
+				exit(0);
 			}
 			
 			// Return
