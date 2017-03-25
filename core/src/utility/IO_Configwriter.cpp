@@ -136,33 +136,13 @@ namespace Utility
 			Append_String_to_File(config, configFile);
 
 			if (hamiltonian->Name() == "Anisotropic Heisenberg") Hamiltonian_Anisotropic_to_Config(configFile, hamiltonian, geometry);
-			else if (hamiltonian->Name() == "Isotropic Heisenberg") Hamiltonian_Isotropic_to_Config(configFile, hamiltonian);
 			else if (hamiltonian->Name() == "Gaussian") Hamiltonian_Gaussian_to_Config(configFile, hamiltonian);
 
 			config = "################# End Hamiltonian ################";
 			Append_String_to_File(config, configFile);
 		}// end Hamiltonian_to_Config
 
-		void Hamiltonian_Isotropic_to_Config(const std::string configFile, std::shared_ptr<Engine::Hamiltonian> hamiltonian)
-		{
-			std::string config = "";
-			Engine::Hamiltonian_Isotropic * ham_iso = (Engine::Hamiltonian_Isotropic *)hamiltonian.get();
-			config += "external_field_magnitude " + std::to_string(ham_iso->external_field_magnitude/Constants::mu_B/ham_iso->mu_s) + "\n";
-			config += "external_field_normal    " + std::to_string(ham_iso->external_field_normal[0]) + " " + std::to_string(ham_iso->external_field_normal[1]) + " " + std::to_string(ham_iso->external_field_normal[2]) + "\n";
-			config += "mu_s                     " + std::to_string(ham_iso->mu_s) + "\n";
-			config += "anisotropy_magnitude     " + std::to_string(ham_iso->anisotropy_magnitude) + "\n";
-			config += "anisotropy_normal        " + std::to_string(ham_iso->anisotropy_normal[0]) + " " + std::to_string(ham_iso->anisotropy_normal[1]) + " " + std::to_string(ham_iso->anisotropy_normal[2]) + "\n";
-			config += "n_neigh_shells  			" + std::to_string(ham_iso->n_neigh_shells) + "\n";
-			config += "jij                      " + std::to_string(ham_iso->jij[0]);
-			for (int i=1; i<ham_iso->n_neigh_shells; ++i) config += " " + std::to_string(ham_iso->jij[i]);
-			config += "\n";
-			config += "dij                      " + std::to_string(ham_iso->dij) + "\n";
-			config += "bij                      " + std::to_string(ham_iso->bij) + "\n";
-			config += "kijkl                    " + std::to_string(ham_iso->kijkl) + "\n";
-			config += "dd_radius                " + std::to_string(ham_iso->dd_radius) + "\n";
-			Append_String_to_File(config, configFile);
-		}// end Hamiltonian_Isotropic_to_Config
-
+		
 		void Hamiltonian_Anisotropic_to_Config(const std::string configFile, std::shared_ptr<Engine::Hamiltonian> hamiltonian, std::shared_ptr<Data::Geometry> geometry)
 		{
 			int n_cells_tot = geometry->n_cells[0]*geometry->n_cells[1]*geometry->n_cells[2];

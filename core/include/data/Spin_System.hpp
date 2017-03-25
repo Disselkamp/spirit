@@ -8,7 +8,6 @@
 #include "Spirit_Defines.h"
 #include <engine/Vectormath_Defines.hpp>
 #include <engine/Hamiltonian.hpp>
-#include <engine/Hamiltonian_Isotropic.hpp>
 #include <engine/Hamiltonian_Anisotropic.hpp>
 #include <engine/Hamiltonian_Gaussian.hpp>
 #include <data/Geometry.hpp>
@@ -25,7 +24,7 @@ namespace Data
 	{
 	public:
 		// Constructor
-		Spin_System(std::unique_ptr<Engine::Hamiltonian> hamiltonian, std::unique_ptr<Geometry> geometry, std::unique_ptr<Parameters_Method_LLG> llg_params, bool iteration_allowed);
+		Spin_System(std::unique_ptr<Engine::Hamiltonian> hamiltonian, std::shared_ptr<Geometry> geometry, std::unique_ptr<Parameters_Method_LLG> llg_params, bool iteration_allowed);
 		// Copy Constructor
 		Spin_System(Spin_System const & other);
 		// Assignment operator

@@ -19,13 +19,15 @@ namespace Data
 
 	// Geometry contains all geometric information about the spin_system
 	// The members are const, as a spin system has to be created new whenever one of these members is changed.
+	// Note that much is saved as "field" so that it is available on GPU if CUDA is used s.t. it can be used
+	// in kernels of the Hamiltonian (index translations across the lattice).
 	class Geometry
 	{
 
 	public:
 		// Constructor
 		Geometry(const std::vector<Vector3> basis, const std::vector<Vector3> translation_vectors,
-			const std::vector<int> n_cells, const std::vector<Vector3> basis_atoms, const scalar lattice_constant,
+			const intfield n_cells, const std::vector<Vector3> basis_atoms, const scalar lattice_constant,
 			const vectorfield spin_pos);
 		// Destructor
 		//~Geometry();
@@ -39,9 +41,9 @@ namespace Data
 		// Translation Vectors [dim][transl_vec]
 		const std::vector<Vector3> translation_vectors;
 		// Number of Translations {nta, ntb, ntc}
-		const std::vector<int> n_cells;
-		// Number of spins per basic domain
-		const int n_spins_basic_domain;
+		const intfield n_cells;
+		// Number of spins per basic domain (intfield to make it available on GPU)
+		const intfield n_spins_basic_domain;
 		// Array of basis atom positions [3][n_basis_atoms]
 		std::vector<Vector3> basis_atoms;
 		// Number of Spins total

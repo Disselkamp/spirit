@@ -62,8 +62,7 @@ SettingsWidget::SettingsWidget(std::shared_ptr<State> state, SpinWidget *spinWid
 
 	// Setup Interactions Tab
 	std::string H_name = Hamiltonian_Get_Name(state.get());
-	if (H_name == "Isotropic Heisenberg") this->tabWidget_Settings->removeTab(3);
-	else if (H_name == "Anisotropic Heisenberg") this->tabWidget_Settings->removeTab(2);
+	if (H_name == "Anisotropic Heisenberg") this->tabWidget_Settings->removeTab(2);
 	else
 	{
 		this->tabWidget_Settings->removeTab(2);
@@ -77,7 +76,6 @@ SettingsWidget::SettingsWidget(std::shared_ptr<State> state, SpinWidget *spinWid
 	// Connect slots
 	this->Setup_Configurations_Slots();
 	this->Setup_Transitions_Slots();
-	this->Setup_Hamiltonian_Isotropic_Slots();
 	this->Setup_Hamiltonian_Anisotropic_Slots();
 	this->Setup_Parameters_Slots();
 	this->Setup_Visualization_Slots();
@@ -87,8 +85,7 @@ void SettingsWidget::updateData()
 {
 	// Load Hamiltonian Contents
 	std::string H_name = Hamiltonian_Get_Name(state.get());
-	if (H_name == "Isotropic Heisenberg") this->Load_Hamiltonian_Isotropic_Contents();
-	else if (H_name == "Anisotropic Heisenberg") this->Load_Hamiltonian_Anisotropic_Contents();
+	if (H_name == "Anisotropic Heisenberg") this->Load_Hamiltonian_Anisotropic_Contents();
 	// Load Parameters Contents
 	this->Load_Parameters_Contents();
 	// ToDo: Also update Debug etc!
@@ -423,98 +420,6 @@ void SettingsWidget::Load_Parameters_Contents()
 	else if (image_type == 3)
 		this->radioButton_Stationary->setChecked(true);
 }
-
-
-void SettingsWidget::Load_Hamiltonian_Isotropic_Contents()
-{
-	float d, vd[3], mu_s, jij[5];
-	int n_neigh_shells;
-
-	// Boundary conditions
-	bool boundary_conditions[3];
-	Hamiltonian_Get_Boundary_Conditions(state.get(), boundary_conditions);
-	this->checkBox_iso_periodical_a->setChecked(boundary_conditions[0]);
-	this->checkBox_iso_periodical_b->setChecked(boundary_conditions[1]);
-	this->checkBox_iso_periodical_c->setChecked(boundary_conditions[2]);
-
-	// mu_s
-	Hamiltonian_Get_mu_s(state.get(), &mu_s);
-	this->lineEdit_muSpin->setText(QString::number(mu_s));
-
-	// External magnetic field
-	Hamiltonian_Get_Field(state.get(), &d, vd);
-	this->lineEdit_extH->setText(QString::number(d));
-	this->lineEdit_extHx->setText(QString::number(vd[0]));
-	this->lineEdit_extHy->setText(QString::number(vd[1]));
-	this->lineEdit_extHz->setText(QString::number(vd[2]));
-	if (d > 0.0) this->checkBox_extH->setChecked(true);
-	
-	// Exchange interaction
-	Hamiltonian_Get_Exchange(state.get(), &n_neigh_shells, jij);
-	if (n_neigh_shells > 0) {
-		lineEdit_exchange1->setText(QString::number(jij[0]));
-		lineEdit_exchange1->setEnabled(true);
-	}
-	else { lineEdit_exchange1->hide(); }
-	if (n_neigh_shells > 1) {
-		lineEdit_exchange2->setText(QString::number(jij[1]));
-		lineEdit_exchange2->setEnabled(true);
-	}
-	else { lineEdit_exchange2->hide(); }
-	if (n_neigh_shells > 2) {
-		lineEdit_exchange3->setText(QString::number(jij[2]));
-		lineEdit_exchange3->setEnabled(true);
-	}
-	else { lineEdit_exchange3->hide(); }
-	if (n_neigh_shells > 3) {
-		lineEdit_exchange4->setText(QString::number(jij[3]));
-		lineEdit_exchange4->setEnabled(true);
-	}
-	else { lineEdit_exchange4->hide(); }
-	if (n_neigh_shells > 4) {
-		lineEdit_exchange5->setText(QString::number(jij[4]));
-		lineEdit_exchange5->setEnabled(true);
-	}
-	else { lineEdit_exchange5->hide(); }
-	checkBox_exchange->setChecked(true);
-
-	// DMI
-	Hamiltonian_Get_DMI(state.get(), &d);
-	this->lineEdit_dmi->setText(QString::number(d));
-	if (d > 0.0) this->checkBox_dmi->setChecked(true);
-
-	// Anisotropy
-	Hamiltonian_Get_Anisotropy(state.get(), &d, vd);
-	this->lineEdit_aniso->setText(QString::number(d));
-	this->lineEdit_anisox->setText(QString::number(vd[0]));
-	this->lineEdit_anisoy->setText(QString::number(vd[1]));
-	this->lineEdit_anisoz->setText(QString::number(vd[2]));
-	if (d > 0.0) this->checkBox_aniso->setChecked(true);
-
-	// Spin polarized current (does not really belong to interactions)
-	Hamiltonian_Get_STT(state.get(), &d, vd);
-	this->lineEdit_spin_torque->setText(QString::number(d));
-	this->lineEdit_spin_torquex->setText(QString::number(vd[0]));
-	this->lineEdit_spin_torquey->setText(QString::number(vd[1]));
-	this->lineEdit_spin_torquez->setText(QString::number(vd[2]));
-	if (d > 0.0) this->checkBox_spin_torque->setChecked(true);
-
-	// BQE
-	Hamiltonian_Get_BQE(state.get(), &d);
-	this->lineEdit_bqe->setText(QString::number(d));
-	if (d > 0.0) this->checkBox_bqe->setChecked(true);
-
-	// FourSpin
-	Hamiltonian_Get_FSC(state.get(), &d);
-	this->lineEdit_fourspin->setText(QString::number(d));
-	if (d > 0.0) this->checkBox_fourspin->setChecked(true);
-
-	// Temperature (does not really belong to interactions)
-	Hamiltonian_Get_Temperature(state.get(), &d);
-	this->lineEdit_temper->setText(QString::number(d));
-	if (d > 0.0) this->checkBox_Temperature->setChecked(true);
-}
-
 
 
 void SettingsWidget::Load_Hamiltonian_Anisotropic_Contents()
@@ -1755,54 +1660,6 @@ void SettingsWidget::print_Energies_to_console()
 // -----------------------------------------------------------------------------------
 // --------------------- Setup functions for Slots and Validators --------------------
 // -----------------------------------------------------------------------------------
-
-void SettingsWidget::Setup_Hamiltonian_Isotropic_Slots()
-{
-	// Boundary conditions
-	connect(this->checkBox_iso_periodical_a, SIGNAL(stateChanged(int)), this, SLOT(set_hamiltonian_iso()));
-	connect(this->checkBox_iso_periodical_b, SIGNAL(stateChanged(int)), this, SLOT(set_hamiltonian_iso()));
-	connect(this->checkBox_iso_periodical_c, SIGNAL(stateChanged(int)), this, SLOT(set_hamiltonian_iso()));
-	// mu_s
-	connect(this->lineEdit_muSpin, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_iso()));
-	// External Magnetic Field
-	connect(this->checkBox_extH, SIGNAL(stateChanged(int)), this, SLOT(set_hamiltonian_iso()));
-	connect(this->lineEdit_extH, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_iso()));
-	connect(this->lineEdit_extHx, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_iso()));
-	connect(this->lineEdit_extHy, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_iso()));
-	connect(this->lineEdit_extHz, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_iso()));
-	// Exchange
-	connect(this->lineEdit_exchange1, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_iso()));
-	connect(this->lineEdit_exchange2, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_iso()));
-	connect(this->lineEdit_exchange3, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_iso()));
-	connect(this->lineEdit_exchange4, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_iso()));
-	connect(this->lineEdit_exchange5, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_iso()));
-	connect(this->checkBox_exchange, SIGNAL(stateChanged(int)), this, SLOT(set_hamiltonian_iso()));
-	// DMI
-	connect(this->checkBox_dmi, SIGNAL(stateChanged(int)), this, SLOT(set_hamiltonian_iso()));
-	connect(this->lineEdit_dmi, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_iso()));
-	// Anisotropy
-	connect(this->checkBox_aniso, SIGNAL(stateChanged(int)), this, SLOT(set_hamiltonian_iso()));
-	connect(this->lineEdit_aniso, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_iso()));
-	connect(this->lineEdit_anisox, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_iso()));
-	connect(this->lineEdit_anisoy, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_iso()));
-	connect(this->lineEdit_anisoz, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_iso()));
-	// Biquadratic Exchange
-	connect(this->checkBox_bqe, SIGNAL(stateChanged(int)), this, SLOT(set_hamiltonian_iso()));
-	connect(this->lineEdit_bqe, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_iso()));
-	// FourSpin Interaction
-	connect(this->checkBox_fourspin, SIGNAL(stateChanged(int)), this, SLOT(set_hamiltonian_iso()));
-	connect(this->lineEdit_fourspin, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_iso()));
-	// Spin Torque (does not really belong to interactions)
-	connect(this->checkBox_spin_torque, SIGNAL(stateChanged(int)), this, SLOT(set_hamiltonian_iso()));
-	connect(this->lineEdit_spin_torque, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_iso()));
-	connect(this->lineEdit_spin_torquex, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_iso()));
-	connect(this->lineEdit_spin_torquey, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_iso()));
-	connect(this->lineEdit_spin_torquez, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_iso()));
-	// Temperature (does not really belong to interactions)
-	connect(this->checkBox_Temperature, SIGNAL(stateChanged(int)), this, SLOT(set_hamiltonian_iso()));
-	connect(this->lineEdit_temper, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_iso()));
-
-}
 
 void SettingsWidget::Setup_Hamiltonian_Anisotropic_Slots()
 {

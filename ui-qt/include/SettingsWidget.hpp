@@ -35,12 +35,10 @@ private:
 	// Setup Slots
 	void Setup_Configurations_Slots();
 	void Setup_Transitions_Slots();
-	void Setup_Hamiltonian_Isotropic_Slots();
 	void Setup_Hamiltonian_Anisotropic_Slots();
 	void Setup_Parameters_Slots();
 	void Setup_Visualization_Slots();
 	// Load a set of parameters from the spin systems
-	void Load_Hamiltonian_Isotropic_Contents();
 	void Load_Hamiltonian_Anisotropic_Contents();
 	void Load_Parameters_Contents();
 	void Load_Visualization_Contents();

@@ -12,10 +12,10 @@
 namespace Data
 {
 	Geometry::Geometry(std::vector<Vector3> basis_i, const std::vector<Vector3> translation_vectors_i,
-		const std::vector<int> n_cells_i, const std::vector<Vector3> basis_atoms_i, const scalar lattice_constant_i,
+		const intfield n_cells_i, const std::vector<Vector3> basis_atoms_i, const scalar lattice_constant_i,
 		const vectorfield spin_pos_i) :
 		basis(basis_i), translation_vectors(translation_vectors_i), n_cells(n_cells_i),
-		n_spins_basic_domain(basis_atoms_i.size()), basis_atoms(basis_atoms_i), lattice_constant(lattice_constant_i),
+		n_spins_basic_domain(1, basis_atoms_i.size()), basis_atoms(basis_atoms_i), lattice_constant(lattice_constant_i),
 		spin_pos(spin_pos_i), nos(basis_atoms_i.size() * n_cells_i[0] * n_cells_i[1] * n_cells_i[2])
 	{
 		// Calculate Bounds of the System
@@ -35,7 +35,7 @@ namespace Data
 		this->cell_bounds_min.setZero();
 		for (unsigned int ivec = 0; ivec < translation_vectors.size(); ++ivec)
 		{
-			for (int iatom = 0; iatom < n_spins_basic_domain; ++iatom)
+			for (int iatom = 0; iatom < n_spins_basic_domain[0]; ++iatom)
 			{
 				auto neighbour1 = basis_atoms[iatom] + translation_vectors[ivec];
 				auto neighbour2 = basis_atoms[iatom] - translation_vectors[ivec];
@@ -156,15 +156,16 @@ namespace Data
 		Vector3 test_vec_basis, test_vec_translations;
 
 		// ----- Find dimensionality of the basis -----
-		if (n_spins_basic_domain == 1) dims_basis = 0;
-		else if (n_spins_basic_domain == 2) dims_basis = 1;
-		else if (n_spins_basic_domain == 3) dims_basis = 2;
+		int N = n_spins_basic_domain[0];
+		if (N == 1) dims_basis = 0;
+		else if (N == 2) dims_basis = 1;
+		else if (N == 3) dims_basis = 2;
 		else
 		{
 			// Get basis atoms relative to the first atom
 			Vector3 v0 = basis_atoms[0];
-			std::vector<Vector3> b_vectors(n_spins_basic_domain-1);
-			for (int i = 1; i < n_spins_basic_domain; ++i)
+			std::vector<Vector3> b_vectors(N-1);
+			for (int i = 1; i < N; ++i)
 			{
 				b_vectors[i-1] = basis_atoms[i] - v0;
 			}

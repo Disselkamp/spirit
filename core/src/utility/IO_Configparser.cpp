@@ -83,9 +83,9 @@ namespace Utility
 			// LLG Parameters
 			auto llg_params = Parameters_Method_LLG_from_Config(configFile);
 			// Hamiltonian
-			auto hamiltonian = std::move(Hamiltonian_from_Config(configFile, *geometry));
+			auto hamiltonian = std::move(Hamiltonian_from_Config(configFile, geometry));
 			// Spin System
-			auto system = std::unique_ptr<Data::Spin_System>(new Data::Spin_System(std::move(hamiltonian), std::move(geometry), std::move(llg_params), false));
+			auto system = std::unique_ptr<Data::Spin_System>(new Data::Spin_System(std::move(hamiltonian), geometry, std::move(llg_params), false));
 			// ----------------------------------------------------------------------------------------------
 			Log(Log_Level::Info, Log_Sender::IO, "-------------- Spin System Initialised -------------");
 
@@ -177,7 +177,7 @@ namespace Utility
 			Log(Log_Level::Info, Log_Sender::IO, "Basis: built");
 		}// End Basis_from_Config
 
-		std::unique_ptr<Data::Geometry> Geometry_from_Config(const std::string configFile)
+		std::shared_ptr<Data::Geometry> Geometry_from_Config(const std::string configFile)
 		{
 			//-------------- Insert default values here -----------------------------
 			// Basis from separate file?
@@ -282,7 +282,7 @@ namespace Utility
 			Log(Log_Level::Parameter, Log_Sender::IO, "Geometry: " + std::to_string(nos) + " spins");
 			
 			// Return geometry
-			auto geometry = std::unique_ptr<Data::Geometry>(new Data::Geometry(basis, translation_vectors, n_cells, basis_atoms, lattice_constant, spin_pos));
+			auto geometry = std::shared_ptr<Data::Geometry>(new Data::Geometry(basis, translation_vectors, n_cells, basis_atoms, lattice_constant, spin_pos));
 			Log(Log_Level::Parameter, Log_Sender::IO, "Geometry is " + std::to_string(geometry->dimensionality) + "-dimensional"); 
 			Log(Log_Level::Info, Log_Sender::IO, "Geometry: built");
 			return geometry;
@@ -495,7 +495,7 @@ namespace Utility
 			return mmf_params;
 		}
 
-		std::unique_ptr<Engine::Hamiltonian> Hamiltonian_from_Config(const std::string configFile, Data::Geometry geometry)
+		std::unique_ptr<Engine::Hamiltonian> Hamiltonian_from_Config(const std::string configFile, const std::shared_ptr<Data::Geometry> geometry)
 		{
 			//-------------- Insert default values here -----------------------------
 			// The type of hamiltonian we will use
@@ -525,15 +525,11 @@ namespace Utility
 			
 			// Hamiltonian
 			std::unique_ptr<Engine::Hamiltonian> hamiltonian;
-			if (hamiltonian_type == "isotropic")
-			{
-				hamiltonian = Hamiltonian_Isotropic_from_Config(configFile, geometry);
-			}// endif isotropic
-			else if (hamiltonian_type == "anisotropic")
+			if (hamiltonian_type == "anisotropic")
 			{
 				// TODO: to std::move or not to std::move, that is the question...
 				hamiltonian = std::move(Hamiltonian_Anisotropic_from_Config(configFile, geometry));
-			}// endif anisotropic
+			}
 			else if (hamiltonian_type == "gaussian")
 			{
 				hamiltonian = std::move(Hamiltonian_Gaussian_from_Config(configFile, geometry));
@@ -541,146 +537,46 @@ namespace Utility
 			else
 			{
 				Log(Log_Level::Error, Log_Sender::IO, "Hamiltonian: Invalid type: " + hamiltonian_type);
-			}// endif neither
+			}
 			
 			// Return
 			Log(Log_Level::Info, Log_Sender::IO, "Hamiltonian: built hamiltonian of type: " + hamiltonian_type);
 			return hamiltonian;
 		}
 
-		std::unique_ptr<Engine::Hamiltonian_Isotropic> Hamiltonian_Isotropic_from_Config(const std::string configFile, Data::Geometry geometry)
-		{
-			//-------------- Insert default values here -----------------------------
-			// Boundary conditions (a, b, c)
-			std::vector<int> boundary_conditions_i = { 0, 0, 0 };
-			std::vector<bool> boundary_conditions = { false, false, false };
-			// Magnetic field magnitude
-			scalar external_field_magnitude = 25;
-			// Magnetic field vector
-			Vector3 external_field_normal = { 0, 0, 1 };
-			// mu_spin
-			scalar mu_s = 2;
-			// Anisotropy constant
-			scalar anisotropy_magnitude = 0;
-			// Anisotropy vector
-			Vector3 anisotropy_normal = { 0, 0, 1 };
-
-			// Number of shells in which we calculate neighbours
-			int n_neigh_shells = 4;
-			// Jij
-			std::vector<scalar> jij = { 10.0, 0.0, 0.0, 0.0 };
-			// DM constant
-			scalar dij = 6.0;
-			int dm_chirality = 1;
-			// Biquidratic exchange constant
-			scalar bij = 0.0;
-			// 4 Spin Interaction constant
-			scalar kijkl = 0.0;
-			// Dipole-Dipole interaction radius
-			scalar dd_radius = 0.0;
-
-			//------------------------------- Parser --------------------------------
-			Log(Log_Level::Info, Log_Sender::IO, "Hamiltonian_Isotropic: building");
-			// iteration variables
-			int iatom = 0;
-			if (configFile != "")
-			{
-				try {
-					IO::Filter_File_Handle myfile(configFile);
-
-					myfile.Read_3Vector(boundary_conditions_i, "boundary_conditions");
-					boundary_conditions[0] = (boundary_conditions_i[0] != 0);
-					boundary_conditions[1] = (boundary_conditions_i[1] != 0);
-					boundary_conditions[2] = (boundary_conditions_i[2] != 0);
-
-					myfile.Read_Single(external_field_magnitude, "external_field_magnitude");
-					myfile.Read_Vector3(external_field_normal, "external_field_normal");
-					myfile.Read_Single(mu_s, "mu_s");
-					myfile.Read_Single(anisotropy_magnitude, "anisotropy_magnitude");
-					myfile.Read_Vector3(anisotropy_normal, "anisotropy_normal");
-					myfile.Read_Single(n_neigh_shells, "n_neigh_shells");
-
-					jij = std::vector<scalar>(n_neigh_shells);
-					if (myfile.Find("jij"))
-					{
-						for (iatom = 0; iatom < n_neigh_shells; ++iatom) {
-							myfile.iss >> jij[iatom];
-						}						
-					}
-					else Log(Log_Level::Error, Log_Sender::IO, "Hamiltonian_Isotropic: Keyword 'jij' not found. Using Default:  { 10.0, 0.5, 0.0, 0.0 }");
-					
-					myfile.Read_Single(dij, "dij");
-					myfile.Read_Single(dm_chirality, "dm_chirality");
-					myfile.Read_Single(bij, "bij");
-					myfile.Read_Single(kijkl, "kijkl");
-					myfile.Read_Single(dd_radius, "dd_radius");
-				}// end try
-				catch (Exception ex) {
-					if (ex == Exception::File_not_Found)
-					{
-						Log(Log_Level::Error, Log_Sender::IO, "Hamiltonian_isotropic: Unable to open Config File " + configFile + " Leaving values at default.");
-					}
-					else throw ex;
-				}// end catch
-			}
-			else Log(Log_Level::Warning, Log_Sender::IO, "Hamiltonian_Isotropic: Using default configuration!");
-			
-			// Return
-			Log(Log_Level::Parameter, Log_Sender::IO, "Hamiltonian_Isotropic:");
-			Log(Log_Level::Parameter, Log_Sender::IO, "        boundary conditions = " + std::to_string(boundary_conditions[0]) + " " + std::to_string(boundary_conditions[1]) + " " + std::to_string(boundary_conditions[2]));
-			Log(Log_Level::Parameter, Log_Sender::IO, "        B                   = " + std::to_string(external_field_magnitude));
-			Log(Log_Level::Parameter, Log_Sender::IO, "        B_normal            = " + std::to_string(external_field_normal[0]) + " " + std::to_string(external_field_normal[1]) + " " + std::to_string(external_field_normal[2]));
-			Log(Log_Level::Parameter, Log_Sender::IO, "        mu_s                = " + std::to_string(mu_s));
-			Log(Log_Level::Parameter, Log_Sender::IO, "        K                   = " + std::to_string(anisotropy_magnitude));
-			Log(Log_Level::Parameter, Log_Sender::IO, "        K_normal            = " + std::to_string(anisotropy_normal[0]) + " " + std::to_string(anisotropy_normal[1]) + " " + std::to_string(anisotropy_normal[2]));
-			Log(Log_Level::Parameter, Log_Sender::IO, "        n_neigh_shells      = " + std::to_string(n_neigh_shells));
-			Log(Log_Level::Parameter, Log_Sender::IO, "        J_ij[0]             = " + std::to_string(jij[0]));
-			Log(Log_Level::Parameter, Log_Sender::IO, "        D_ij                = " + std::to_string(dij));
-			Log(Log_Level::Parameter, Log_Sender::IO, "        DM chirality        = " + std::to_string(dm_chirality));
-			Log(Log_Level::Parameter, Log_Sender::IO, "        B_ij                = " + std::to_string(bij));
-			Log(Log_Level::Parameter, Log_Sender::IO, "        K_ijkl              = " + std::to_string(kijkl));
-			Log(Log_Level::Parameter, Log_Sender::IO, "        dd_radius           = " + std::to_string(dd_radius));
-			auto hamiltonian = std::unique_ptr<Engine::Hamiltonian_Isotropic>(new Engine::Hamiltonian_Isotropic(boundary_conditions, external_field_magnitude,
-					external_field_normal, mu_s, anisotropy_magnitude, anisotropy_normal,
-					n_neigh_shells, jij, dij, dm_chirality, bij, kijkl, dd_radius, geometry));
-			Log(Log_Level::Info, Log_Sender::IO, "Hamiltonian_Isotropic: built");
-			return hamiltonian;
-		}// end Hamiltonian_Isotropic_from_Config
-
-
 		
-		std::unique_ptr<Engine::Hamiltonian_Anisotropic> Hamiltonian_Anisotropic_from_Config(const std::string configFile, Data::Geometry geometry)
+		std::unique_ptr<Engine::Hamiltonian_Anisotropic> Hamiltonian_Anisotropic_from_Config(const std::string configFile, const std::shared_ptr<Data::Geometry> geometry)
 		{
 			//-------------- Insert default values here -----------------------------
 			// Boundary conditions (a, b, c)
 			std::vector<int> boundary_conditions_i = { 0, 0, 0 };
 			std::vector<bool> boundary_conditions = { false, false, false };
 			// Spin moment
-			scalarfield mu_s = scalarfield(geometry.nos, 2);	// [nos]
+			scalarfield mu_s = scalarfield(geometry->nos, 2);	// [nos]
 			// External Magnetic Field
 			std::string external_field_file = "";
 			scalar B = 0;
 			Vector3 B_normal = { 0.0, 0.0, 1.0 };
-			intfield    external_field_index(geometry.nos);				// [nos]
-			scalarfield external_field_magnitude(geometry.nos, 0);	// [nos]
-			vectorfield external_field_normal(geometry.nos, B_normal);	// [3][nos]
+			intfield    external_field_index(geometry->nos);				// [nos]
+			scalarfield external_field_magnitude(geometry->nos, 0);	// [nos]
+			vectorfield external_field_normal(geometry->nos, B_normal);	// [3][nos]
 			
 			// Anisotropy
 			std::string anisotropy_file = "";
 			scalar K = 0;
 			Vector3 K_normal = { 0.0, 0.0, 1.0 };
 			bool anisotropy_from_file = false;
-			intfield    anisotropy_index(geometry.nos);				// [nos]
-			scalarfield anisotropy_magnitude(geometry.nos, 0.0);	// [nos]
-			vectorfield anisotropy_normal(geometry.nos, K_normal);	// [nos][3]
+			intfield    anisotropy_index(geometry->nos);				// [nos]
+			scalarfield anisotropy_magnitude(geometry->nos, 0.0);	// [nos]
+			vectorfield anisotropy_normal(geometry->nos, K_normal);	// [nos][3]
 
 			// ------------ Pair Interactions ------------
 			int n_pairs = 0;
 			std::string interaction_pairs_file = "";
 			bool interaction_pairs_from_file = false;
-			std::vector<indexPairs> Exchange_indices(8); std::vector<scalarfield> Exchange_magnitude(8);
-			std::vector<indexPairs> DMI_indices(8); std::vector<scalarfield> DMI_magnitude(8); std::vector<vectorfield> DMI_normal(8);
-			std::vector<indexPairs> DD_indices(8); std::vector<scalarfield> DD_magnitude(8); std::vector<vectorfield> DD_normal(8);
+			std::vector<pairfield> Exchange_indices(8); std::vector<scalarfield> Exchange_magnitude(8);
+			std::vector<pairfield> DMI_indices(8); std::vector<scalarfield> DMI_magnitude(8); std::vector<vectorfield> DMI_normal(8);
+			std::vector<pairfield> DD_indices(8); std::vector<scalarfield> DD_magnitude(8); std::vector<vectorfield> DD_normal(8);
 
 			scalar dd_radius = 0.0;
 
@@ -688,7 +584,7 @@ namespace Utility
 			int n_quadruplets = 0;
 			std::string quadruplets_file = "";
 			bool quadruplets_from_file = false;
-			std::vector<indexQuadruplets> quadruplet_indices(8); std::vector<scalarfield> quadruplet_magnitude(8);
+			std::vector<quadrupletfield> quadruplet_indices(8); std::vector<scalarfield> quadruplet_magnitude(8);
 
 			//------------------------------- Parser --------------------------------
 			Log(Log_Level::Info, Log_Sender::IO, "Hamiltonian_Anisotropic: building");
@@ -706,15 +602,16 @@ namespace Utility
 					boundary_conditions[2] = (boundary_conditions_i[2] != 0);
 
 					// Spin moment
-					mu_s = scalarfield(geometry.nos, 2.0);
+					mu_s = scalarfield(geometry->nos, 2.0);
+					int N = geometry->n_spins_basic_domain[0];
 					if (myfile.Find("mu_s"))
 					{
-						for (iatom = 0; iatom < geometry.n_spins_basic_domain; ++iatom)
+						for (iatom = 0; iatom < N; ++iatom)
 						{
 							myfile.iss >> mu_s[iatom];
-							for (int ispin = 0; ispin < geometry.nos / geometry.n_spins_basic_domain; ++ispin)
+							for (int ispin = 0; ispin < geometry->nos / N; ++ispin)
 							{
-								mu_s[ispin*geometry.n_spins_basic_domain + iatom] = mu_s[iatom];
+								mu_s[ispin*N + iatom] = mu_s[iatom];
 							}
 						}
 					}
@@ -741,7 +638,7 @@ namespace Utility
 						if (B != 0)
 						{
 							// Fill the arrays
-							for (int i = 0; i < geometry.nos; ++i)
+							for (int i = 0; i < geometry->nos; ++i)
 							{
 								external_field_index[i] = i;
 								external_field_magnitude[i] = B;
@@ -776,7 +673,7 @@ namespace Utility
 						if (K != 0)
 						{
 							// Fill the arrays
-							for (int i = 0; i < geometry.nos; ++i)
+							for (int i = 0; i < geometry->nos; ++i)
 							{
 								anisotropy_index[i] = i;
 								anisotropy_magnitude[i] = K;
@@ -825,7 +722,7 @@ namespace Utility
 					// Engine::Neighbours::Create_DD_Pairs_from_Neighbours(geometry, dd_neigh, dd_neigh_pos, dd_distance, dd_normal, DD_indices, DD_magnitude, DD_normal);
 					
 					
-					Engine::Neighbours::Create_Dipole_Pairs(geometry, dd_radius, DD_indices, DD_magnitude, DD_normal);
+					Engine::Neighbours::Create_Dipole_Pairs(*geometry, dd_radius, DD_indices, DD_magnitude, DD_normal);
 
 
 					// Interaction Quadruplets
@@ -865,6 +762,7 @@ namespace Utility
 				DMI_indices, DMI_magnitude, DMI_normal,
 				DD_indices, DD_magnitude, DD_normal,
 				quadruplet_indices, quadruplet_magnitude,
+				geometry,
 				boundary_conditions
 			));
 			Log(Log_Level::Info, Log_Sender::IO, "Hamiltonian_Anisotropic: built");
@@ -872,7 +770,7 @@ namespace Utility
 		}// end Hamiltonian_Anisotropic_From_Config
 		
 		
-		std::unique_ptr<Engine::Hamiltonian_Gaussian> Hamiltonian_Gaussian_from_Config(const std::string configFile, Data::Geometry geometry)
+		std::unique_ptr<Engine::Hamiltonian_Gaussian> Hamiltonian_Gaussian_from_Config(const std::string configFile, const std::shared_ptr<Data::Geometry> geometry)
 		{
 			//-------------- Insert default values here -----------------------------
 			// Number of Gaussians

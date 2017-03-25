@@ -319,8 +319,8 @@ namespace Utility
 		Read from Pairs file by Markus & Bernd
 		*/
 		void Pairs_from_File(const std::string pairsFile, Data::Geometry geometry, int & nop,
-			std::vector<indexPairs> & Exchange_indices, std::vector<scalarfield> & Exchange_magnitude,
-			std::vector<indexPairs> & DMI_indices, std::vector<scalarfield> & DMI_magnitude, std::vector<vectorfield> & DMI_normal)
+			std::vector<pairfield> & Exchange_indices, std::vector<scalarfield> & Exchange_magnitude,
+			std::vector<pairfield> & DMI_indices, std::vector<scalarfield> & DMI_magnitude, std::vector<vectorfield> & DMI_normal)
 		{
 			Log(Log_Level::Info, Log_Sender::IO, "Reading spin pairs from file " + pairsFile);
 			try {
@@ -520,12 +520,12 @@ namespace Utility
 								// Add the indices and parameters to the corresponding lists
 								if (pair_Jij != 0)
 								{
-									Exchange_indices[pair_periodicity].push_back(indexPair{ idx_i, idx_j });
+									Exchange_indices[pair_periodicity].push_back(pairfield{ idx_i, idx_j });
 									Exchange_magnitude[pair_periodicity].push_back(pair_Jij);
 								}
 								if (pair_Dij != 0)
 								{
-									DMI_indices[pair_periodicity].push_back(indexPair{ idx_i, idx_j });
+									DMI_indices[pair_periodicity].push_back(pairfield{ idx_i, idx_j });
 									DMI_magnitude[pair_periodicity].push_back(pair_Dij);
 									DMI_normal[pair_periodicity].push_back(Vector3{pair_D1, pair_D2, pair_D3});
 								}
@@ -552,7 +552,7 @@ namespace Utility
 		Read from Quadruplet file
 		*/
 		void Quadruplets_from_File(const std::string quadrupletsFile, Data::Geometry geometry, int & noq,
-			std::vector<indexQuadruplets> & quadruplet_indices, std::vector<scalarfield> & quadruplet_magnitude)
+			std::vector<quadrupletfield> & quadruplet_indices, std::vector<scalarfield> & quadruplet_magnitude)
 		{
 			Log(Log_Level::Info, Log_Sender::IO, "Reading spin quadruplets from file " + quadrupletsFile);
 			try {
@@ -759,7 +759,7 @@ namespace Utility
 								// Add the indices and parameter to the corresponding list
 								if (q_Q != 0)
 								{
-									quadruplet_indices[quadruplet_periodicity].push_back(indexQuadruplet{ idx_i, idx_j, idx_k, idx_l });
+									quadruplet_indices[quadruplet_periodicity].push_back(quadrupletfield{ idx_i, idx_j, idx_k, idx_l });
 									quadruplet_magnitude[quadruplet_periodicity].push_back(q_Q);
 								}
 							}

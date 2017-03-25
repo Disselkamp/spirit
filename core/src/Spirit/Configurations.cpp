@@ -158,7 +158,8 @@ bool Configuration_From_Clipboard_Shift(State *state, const float position_initi
 		return false;
 
 	auto& geometry = *image->geometry;
-	int delta = geometry.n_spins_basic_domain*da + geometry.n_spins_basic_domain*geometry.n_cells[0] * db + geometry.n_spins_basic_domain*geometry.n_cells[0] * geometry.n_cells[1] * dc;
+	int N = geometry.n_spins_basic_domain[0];
+	int delta = N*da + N*geometry.n_cells[0] * db + N*geometry.n_cells[0] * geometry.n_cells[1] * dc;
 
 	// Create position filter
 	auto filter = get_filter(pos_final, r_cut_rectangular, r_cut_cylindrical, r_cut_spherical, inverted);
