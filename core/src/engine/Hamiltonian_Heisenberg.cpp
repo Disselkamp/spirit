@@ -20,27 +20,34 @@ namespace Engine
 {
 	inline bool boundary_conditions_fulfilled(const intfield & n_cells, const boolfield & boundary_conditions, const std::array<int,3> & translations_i, const std::array<int,3> & translations_j)
 	{
-		return  (boundary_conditions[0] || translations_i[0]+translations_j[0] < n_cells[0]) &&
-				(boundary_conditions[1] || translations_i[1]+translations_j[1] < n_cells[1]) &&
-				(boundary_conditions[2] || translations_i[2]+translations_j[2] < n_cells[2]);
+		int da = translations_i[0]+translations_j[0];
+		int db = translations_i[1]+translations_j[1];
+		int dc = translations_i[2]+translations_j[2];
+		return  ( ( boundary_conditions[0] || (0 <= da && da < n_cells[0]) ) &&
+				  ( boundary_conditions[1] || (0 <= db && db < n_cells[1]) ) &&
+				  ( boundary_conditions[2] || (0 <= dc && dc < n_cells[2]) ) );
 	}
 
-	inline int idx_from_translations(const intfield & n_cells, const intfield & n_spins_basic_domain, const std::array<int,3> & translations)
+	inline int idx_from_translations(const intfield & n_cells, const intfield & n_spins_basic_domain, const std::array<int,3> & translations_i, const std::array<int,3> & translations)
 	{
 		int Na = n_cells[0];
 		int Nb = n_cells[1];
 		int Nc = n_cells[2];
 		int N  = n_spins_basic_domain[0];
 		
-		int idx = translations[0]*N + translations[1]*N*Na + translations[2]*N*Na*Nb;
-		
-		if (translations[0] < 0)
-			idx += N*Na;
-		if (translations[1] < 0)
-			idx += N*Na*Nb;
-		if (translations[2] < 0)
-			idx += N*Na*Nb*Nc;
+		int da = translations_i[0]+translations[0];
+		int db = translations_i[1]+translations[1];
+		int dc = translations_i[2]+translations[2];
 
+		if (translations[0] < 0)
+			da += N*Na;
+		if (translations[1] < 0)
+			db += N*Na*Nb;
+		if (translations[2] < 0)
+			dc += N*Na*Nb*Nc;
+			
+		int idx = (da%Na)*N + (db%Nb)*N*Na + (dc%Nc)*N*Na*Nb;
+		
 		return idx;
 	}
 
@@ -192,7 +199,7 @@ namespace Engine
 			{
 				if ( boundary_conditions_fulfilled(geometry->n_cells, boundary_conditions, translations, Exchange_pairs[i_pair].translations) )
 				{
-					int jspin = ispin + idx_from_translations(geometry->n_cells, geometry->n_spins_basic_domain, translations);
+					int jspin = idx_from_translations(geometry->n_cells, geometry->n_spins_basic_domain, translations, Exchange_pairs[i_pair].translations);
 					Energy[ispin] -= 0.5 * Exchange_magnitude[i_pair] * spins[ispin].dot(spins[jspin]);
 				}
 			}
@@ -208,7 +215,7 @@ namespace Engine
 			{
 				if ( boundary_conditions_fulfilled(geometry->n_cells, boundary_conditions, translations, DMI_pairs[i_pair].translations) )
 				{
-					int jspin = ispin + idx_from_translations(geometry->n_cells, geometry->n_spins_basic_domain, translations);
+					int jspin = idx_from_translations(geometry->n_cells, geometry->n_spins_basic_domain, translations, DMI_pairs[i_pair].translations);
 					Energy[ispin] -= 0.5 * DMI_magnitude[i_pair] * DMI_normal[i_pair].dot(spins[ispin].cross(spins[jspin]));
 				}
 			}
@@ -266,7 +273,9 @@ namespace Engine
 		this->Gradient_DMI(spins, gradient);
 		// DD
 		this->Gradient_DD(spins, gradient);
+
 		// Triplet
+
 		// Quadruplet
 		this->Gradient_Quadruplet(spins, gradient);
 	}
@@ -296,7 +305,7 @@ namespace Engine
 			{
 				if ( boundary_conditions_fulfilled(geometry->n_cells, boundary_conditions, translations, Exchange_pairs[i_pair].translations) )
 				{
-					int jspin = ispin + idx_from_translations(geometry->n_cells, geometry->n_spins_basic_domain, translations);
+					int jspin = idx_from_translations(geometry->n_cells, geometry->n_spins_basic_domain, translations, Exchange_pairs[i_pair].translations);
 					gradient[ispin] -= Exchange_magnitude[i_pair] * spins[jspin];
 				}
 			}
@@ -312,7 +321,7 @@ namespace Engine
 			{
 				if ( boundary_conditions_fulfilled(geometry->n_cells, boundary_conditions, translations, DMI_pairs[i_pair].translations) )
 				{
-					int jspin = ispin + idx_from_translations(geometry->n_cells, geometry->n_spins_basic_domain, translations);
+					int jspin = idx_from_translations(geometry->n_cells, geometry->n_spins_basic_domain, translations, DMI_pairs[i_pair].translations);
 					gradient[ispin] -= DMI_magnitude[i_pair] * spins[jspin].cross(DMI_normal[i_pair]);
 				}
 			}

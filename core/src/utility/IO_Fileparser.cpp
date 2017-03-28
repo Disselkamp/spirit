@@ -455,12 +455,19 @@ namespace Utility
 					{
 						Exchange_pairs.push_back(Pair{ pair_i, pair_j, {pair_da, pair_db, pair_dc} });
 						Exchange_magnitude.push_back(pair_Jij);
+						// Mirror
+						Exchange_pairs.push_back(Pair{ pair_j, pair_i, {-pair_da, -pair_db, -pair_dc} });
+						Exchange_magnitude.push_back(pair_Jij);
 					}
 					if (pair_Dij != 0)
 					{
 						DMI_pairs.push_back(Pair{ pair_i, pair_j, {pair_da, pair_db, pair_dc} });
 						DMI_magnitude.push_back(pair_Dij);
 						DMI_normal.push_back(Vector3{pair_D1, pair_D2, pair_D3});
+						// Mirror
+						DMI_pairs.push_back(Pair{ pair_j, pair_i, {-pair_da, -pair_db, -pair_dc} });
+						DMI_magnitude.push_back(pair_Dij);
+						DMI_normal.push_back(Vector3{-pair_D1, -pair_D2, -pair_D3});
 					}
 
 					++i_pair;
