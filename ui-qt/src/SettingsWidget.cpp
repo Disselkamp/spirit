@@ -471,13 +471,14 @@ void SettingsWidget::Load_Hamiltonian_Heisenberg_Contents()
 	this->doubleSpinBox_Heisenberg_anisotropy_direction_y->setValue(vd[1]);
 	this->doubleSpinBox_Heisenberg_anisotropy_direction_z->setValue(vd[2]);
 
-	// Number of Shells
-
 	// Exchange
+	this->heisenberg_set_nshells_exchange();
 
 	// DMI
+	this->heisenberg_set_nshells_dmi();
 
 	// Dipole-dipole
+	d = Hamiltonian_Get_DDI_Radius(state.get());
 }
 
 void SettingsWidget::Load_Visualization_Contents()
@@ -671,18 +672,6 @@ void SettingsWidget::Load_Visualization_Contents()
 // --------------------- Setters for Hamiltonians and Parameters ---------------------
 // -----------------------------------------------------------------------------------
 
-
-void SettingsWidget::Heisenberg_Add_Shell(float exchange, float dmi)
-{
-
-}
-
-void SettingsWidget::Heisenberg_Remove_Shell()
-{
-
-}
-
-
 void SettingsWidget::set_parameters()
 {
 	// Closure to set the parameters of a specific spin system
@@ -825,9 +814,12 @@ void SettingsWidget::set_hamiltonian_iso()
 		Hamiltonian_Set_Exchange(state.get(), i, jij, idx_image, idx_chain);
 		
 		// DMI
-		if (this->checkBox_dmi->isChecked()) d = this->lineEdit_dmi->text().toFloat();
-		else d = 0.0;
-		Hamiltonian_Set_DMI(state.get(), d, idx_image, idx_chain);
+		if (this->checkBox_dmi->isChecked())
+			d = this->lineEdit_dmi->text().toFloat();
+		else
+			d = 0.0;
+		float dij[1]{d};
+		Hamiltonian_Set_DMI(state.get(), 1, dij, idx_image, idx_chain);
 
 		// Anisotropy
 		//		magnitude
@@ -1022,6 +1014,172 @@ void SettingsWidget::set_heisenberg_anisotropy()
 		Hamiltonian_Set_Anisotropy(state.get(), d, vd, idx_image, idx_chain);
 	};
 	
+	if (this->comboBox_Heisenberg_ApplyTo->currentText() == "Current Image")
+	{
+		apply(System_Get_Index(state.get()), Chain_Get_Index(state.get()));
+	}
+	else if (this->comboBox_Heisenberg_ApplyTo->currentText() == "Current Image Chain")
+	{
+		for (int i=0; i<Chain_Get_NOI(state.get()); ++i)
+		{
+			apply(i, Chain_Get_Index(state.get()));
+		}
+	}
+	else if (this->comboBox_Heisenberg_ApplyTo->currentText() == "All Images")
+	{
+		for (int ichain=0; ichain<Collection_Get_NOC(state.get()); ++ichain)
+		{
+			for (int img=0; img<Chain_Get_NOI(state.get(), ichain); ++img)
+			{
+				apply(img, ichain);
+			}
+		}
+	}
+}
+
+void SettingsWidget::set_heisenberg_exchange()
+{
+	// Closure to set the parameters of a specific spin system
+	auto apply = [this](int idx_image, int idx_chain) -> void
+	{
+		int n_shells = 0;
+		std::vector<float> jij(0);
+		if (checkBox_Heisenberg_exchange->isChecked())
+		{
+			n_shells = spinBoxes_exchange.size();
+			jij = std::vector<float>(n_shells);
+			for (int shell=0; shell < n_shells; ++shell)
+			{
+				jij[shell] = spinBoxes_exchange[shell]->value();
+			}
+		}
+		Hamiltonian_Set_Exchange(state.get(), n_shells, jij.data(), idx_image, idx_chain);
+	};
+
+	if (this->comboBox_Heisenberg_ApplyTo->currentText() == "Current Image")
+	{
+		apply(System_Get_Index(state.get()), Chain_Get_Index(state.get()));
+	}
+	else if (this->comboBox_Heisenberg_ApplyTo->currentText() == "Current Image Chain")
+	{
+		for (int i=0; i<Chain_Get_NOI(state.get()); ++i)
+		{
+			apply(i, Chain_Get_Index(state.get()));
+		}
+	}
+	else if (this->comboBox_Heisenberg_ApplyTo->currentText() == "All Images")
+	{
+		for (int ichain=0; ichain<Collection_Get_NOC(state.get()); ++ichain)
+		{
+			for (int img=0; img<Chain_Get_NOI(state.get(), ichain); ++img)
+			{
+				apply(img, ichain);
+			}
+		}
+	}
+}
+
+void SettingsWidget::heisenberg_set_nshells_exchange()
+{
+	int nshells = this->spinBox_Heisenberg_exchange_nshells->value();
+	if (nshells > this->spinBoxes_exchange.size())
+	{
+		for (int i=this->spinBoxes_exchange.size(); i<nshells; ++i)
+		{
+			this->spinBoxes_exchange.push_back(new QDoubleSpinBox());
+			connect(this->spinBoxes_exchange.back(), SIGNAL(editingFinished()), this, SLOT(set_heisenberg_exchange()));
+			this->layout_Heisenberg_exchange->addWidget(this->spinBoxes_exchange.back());
+		}
+	}
+	else if (nshells < this->spinBoxes_exchange.size())
+	{
+		for (int i=nshells; i<this->spinBoxes_exchange.size(); --i)
+		{
+			this->layout_Heisenberg_exchange->removeWidget(this->spinBoxes_exchange.back());
+			this->spinBoxes_exchange.back()->close();
+			this->spinBoxes_exchange.pop_back();
+		}
+	}
+}
+
+void SettingsWidget::set_heisenberg_dmi()
+{
+	// Closure to set the parameters of a specific spin system
+	auto apply = [this](int idx_image, int idx_chain) -> void
+	{
+		int n_shells = 0;
+		std::vector<float> dij(0);
+		if (checkBox_Heisenberg_dmi->isChecked())
+		{
+			n_shells = spinBoxes_dmi.size();
+			dij = std::vector<float>(n_shells);
+			for (int shell=0; shell < n_shells; ++shell)
+			{
+				dij[shell] = spinBoxes_dmi[shell]->value();
+			}
+		}
+		Hamiltonian_Set_DMI(state.get(), n_shells, dij.data(), idx_image, idx_chain);
+	};
+
+	if (this->comboBox_Heisenberg_ApplyTo->currentText() == "Current Image")
+	{
+		apply(System_Get_Index(state.get()), Chain_Get_Index(state.get()));
+	}
+	else if (this->comboBox_Heisenberg_ApplyTo->currentText() == "Current Image Chain")
+	{
+		for (int i=0; i<Chain_Get_NOI(state.get()); ++i)
+		{
+			apply(i, Chain_Get_Index(state.get()));
+		}
+	}
+	else if (this->comboBox_Heisenberg_ApplyTo->currentText() == "All Images")
+	{
+		for (int ichain=0; ichain<Collection_Get_NOC(state.get()); ++ichain)
+		{
+			for (int img=0; img<Chain_Get_NOI(state.get(), ichain); ++img)
+			{
+				apply(img, ichain);
+			}
+		}
+	}
+}
+
+void SettingsWidget::heisenberg_set_nshells_dmi()
+{
+	int nshells = this->spinBox_Heisenberg_dmi_nshells->value();
+	if (nshells > this->spinBoxes_dmi.size())
+	{
+		for (int i=this->spinBoxes_dmi.size(); i<nshells; ++i)
+		{
+			this->spinBoxes_dmi.push_back(new QDoubleSpinBox());
+			connect(this->spinBoxes_dmi.back(), SIGNAL(editingFinished()), this, SLOT(set_heisenberg_dmi()));
+			this->layout_Heisenberg_dmi->addWidget(this->spinBoxes_dmi.back());
+		}
+	}
+	else if (nshells < this->spinBoxes_dmi.size())
+	{
+		for (int i=nshells; i<this->spinBoxes_dmi.size(); --i)
+		{
+			this->layout_Heisenberg_dmi->removeWidget(this->spinBoxes_dmi.back());
+			this->spinBoxes_dmi.back()->close();
+			this->spinBoxes_dmi.pop_back();
+		}
+	}
+}
+
+void SettingsWidget::set_heisenberg_ddi()
+{
+	// Closure to set the parameters of a specific spin system
+	auto apply = [this](int idx_image, int idx_chain) -> void
+	{
+		float r = 0;
+		if (checkBox_Heisenberg_dd->isChecked())
+		{
+			r = doubleSpinBox_Heisenberg_dd_radius->value();
+		}
+		Hamiltonian_Set_DDI_Radius(state.get(), r, idx_image, idx_chain);
+	};
+
 	if (this->comboBox_Heisenberg_ApplyTo->currentText() == "Current Image")
 	{
 		apply(System_Get_Index(state.get()), Chain_Get_Index(state.get()));
@@ -1569,6 +1727,15 @@ void SettingsWidget::Setup_Hamiltonian_Heisenberg_Slots()
 	connect(this->doubleSpinBox_Heisenberg_anisotropy_direction_x, SIGNAL(editingFinished()), this, SLOT(set_heisenberg_anisotropy()));
 	connect(this->doubleSpinBox_Heisenberg_anisotropy_direction_y, SIGNAL(editingFinished()), this, SLOT(set_heisenberg_anisotropy()));
 	connect(this->doubleSpinBox_Heisenberg_anisotropy_direction_z, SIGNAL(editingFinished()), this, SLOT(set_heisenberg_anisotropy()));
+	// Exchange
+	connect(this->checkBox_Heisenberg_exchange, SIGNAL(stateChanged(int)), this, SLOT(set_heisenberg_exchange()));
+	connect(this->spinBox_Heisenberg_exchange_nshells, SIGNAL(editingFinished()), this, SLOT(heisenberg_set_nshells_exchange()));
+	// DMI
+	connect(this->checkBox_Heisenberg_dmi, SIGNAL(stateChanged(int)), this, SLOT(set_heisenberg_dmi()));
+	connect(this->spinBox_Heisenberg_dmi_nshells, SIGNAL(editingFinished()), this, SLOT(heisenberg_set_nshells_dmi()));
+	// DDI
+	connect(this->checkBox_Heisenberg_dd, SIGNAL(stateChanged(int)), this, SLOT(set_heisenberg_ddi()));
+	connect(this->doubleSpinBox_Heisenberg_dd_radius, SIGNAL(editingFinished()), this, SLOT(set_heisenberg_ddi()));
 }
 
 void SettingsWidget::Setup_Parameters_Slots()

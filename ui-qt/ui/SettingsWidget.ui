@@ -44,7 +44,7 @@
       </size>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab_Settings_Configurations">
       <attribute name="title">
@@ -1526,24 +1526,116 @@
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_70">
-           <item row="5" column="1">
-            <widget class="QCheckBox" name="checkBox_Heisenberg_periodical_c">
-             <property name="text">
-              <string>Periodical c</string>
+           <item row="12" column="1">
+            <spacer name="verticalSpacer_26">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Maximum</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="24" column="1">
+            <widget class="QPlainTextEdit" name="plainTextEdit_Heisenberg_pairs">
+             <property name="locale">
+              <locale language="C" country="AnyCountry"/>
+             </property>
+             <property name="plainText">
+              <string># Manual pair input</string>
              </property>
             </widget>
            </item>
            <item row="19" column="1">
-            <layout class="QGridLayout" name="gridLayout_92">
+            <spacer name="verticalSpacer_27">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Maximum</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="14" column="1">
+            <layout class="QGridLayout" name="gridLayout_90">
              <item row="0" column="0">
-              <widget class="QCheckBox" name="checkBox_Heisenberg_bqe">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
+              <widget class="QCheckBox" name="checkBox_Heisenberg_exchange">
                <property name="text">
-                <string>BQE</string>
+                <string>Exchange</string>
                </property>
               </widget>
+             </item>
+             <item row="0" column="1">
+              <layout class="QGridLayout" name="gridLayout_96">
+               <item row="0" column="0">
+                <spacer name="horizontalSpacer_56">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Minimum</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLabel" name="label_72">
+                 <property name="text">
+                  <string>Number of Shells</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="2">
+                <widget class="QSpinBox" name="spinBox_Heisenberg_exchange_nshells">
+                 <property name="locale">
+                  <locale language="C" country="AnyCountry"/>
+                 </property>
+                 <property name="minimum">
+                  <number>1</number>
+                 </property>
+                 <property name="maximum">
+                  <number>99</number>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="0" column="2">
+              <spacer name="horizontalSpacer_54">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="1" column="1">
+              <layout class="QVBoxLayout" name="layout_Heisenberg_exchange">
+               <property name="sizeConstraint">
+                <enum>QLayout::SetMinimumSize</enum>
+               </property>
+              </layout>
              </item>
             </layout>
            </item>
@@ -1674,49 +1766,39 @@
              </item>
             </layout>
            </item>
-           <item row="4" column="1">
-            <widget class="QCheckBox" name="checkBox_Heisenberg_periodical_b">
-             <property name="text">
-              <string>Periodical b</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <layout class="QGridLayout" name="gridLayout_55">
-             <item row="1" column="1">
-              <widget class="QLabel" name="label_40">
+           <item row="1" column="1">
+            <layout class="QGridLayout" name="gridLayout_94">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_73">
                <property name="text">
-                <string>Apply to</string>
+                <string>Delta</string>
                </property>
               </widget>
              </item>
-             <item row="1" column="2">
-              <widget class="QComboBox" name="comboBox_Heisenberg_ApplyTo">
-               <property name="minimumSize">
-                <size>
-                 <width>120</width>
-                 <height>0</height>
-                </size>
+             <item row="0" column="1">
+              <widget class="QDoubleSpinBox" name="doubleSpinBox_Heisenberg_delta">
+               <property name="locale">
+                <locale language="C" country="AnyCountry"/>
                </property>
-               <item>
-                <property name="text">
-                 <string>Current Image</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Current Image Chain</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>All Images</string>
-                </property>
-               </item>
+               <property name="decimals">
+                <number>4</number>
+               </property>
+               <property name="minimum">
+                <double>0.000100000000000</double>
+               </property>
+               <property name="maximum">
+                <double>100.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="value">
+                <double>1.000000000000000</double>
+               </property>
               </widget>
              </item>
-             <item row="1" column="3">
-              <spacer name="horizontalSpacer_45">
+             <item row="0" column="2">
+              <spacer name="horizontalSpacer_46">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
@@ -1729,79 +1811,6 @@
               </spacer>
              </item>
             </layout>
-           </item>
-           <item row="20" column="1">
-            <layout class="QGridLayout" name="gridLayout_93">
-             <item row="0" column="0">
-              <widget class="QCheckBox" name="checkBox_Heisenberg_fsc">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="text">
-                <string>FSC</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item row="23" column="1">
-            <widget class="QPlainTextEdit" name="plainTextEdit_Heisenberg_pairs">
-             <property name="locale">
-              <locale language="C" country="AnyCountry"/>
-             </property>
-             <property name="plainText">
-              <string># Manual pair input</string>
-             </property>
-            </widget>
-           </item>
-           <item row="24" column="1">
-            <spacer name="verticalSpacer_22">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>941</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="3" column="1">
-            <widget class="QCheckBox" name="checkBox_Heisenberg_periodical_a">
-             <property name="text">
-              <string>Periodical a</string>
-             </property>
-            </widget>
-           </item>
-           <item row="15" column="1">
-            <layout class="QGridLayout" name="gridLayout_90">
-             <item row="0" column="0">
-              <widget class="QCheckBox" name="checkBox_Heisenberg_exchange">
-               <property name="text">
-                <string>Exchange</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item row="16" column="1">
-            <layout class="QGridLayout" name="gridLayout_91">
-             <item row="0" column="0">
-              <widget class="QCheckBox" name="checkBox_Heisenberg_dmi">
-               <property name="text">
-                <string>DMI</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item row="22" column="1">
-            <widget class="QLabel" name="label_59">
-             <property name="text">
-              <string>Manual Pairs</string>
-             </property>
-            </widget>
            </item>
            <item row="11" column="1">
             <layout class="QGridLayout" name="gridLayout_89">
@@ -1899,55 +1908,50 @@
              </item>
             </layout>
            </item>
+           <item row="25" column="1">
+            <spacer name="verticalSpacer_22">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>941</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="5" column="1">
+            <widget class="QCheckBox" name="checkBox_Heisenberg_periodical_c">
+             <property name="text">
+              <string>Periodical c</string>
+             </property>
+            </widget>
+           </item>
+           <item row="23" column="1">
+            <widget class="QLabel" name="label_59">
+             <property name="text">
+              <string>Manual Pairs</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <spacer name="verticalSpacer_29">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Maximum</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
            <item row="18" column="1">
-            <spacer name="verticalSpacer_27">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Maximum</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="21" column="1">
-            <spacer name="verticalSpacer_23">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Maximum</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="6" column="1">
-            <spacer name="verticalSpacer_24">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Maximum</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="17" column="1">
             <layout class="QGridLayout" name="gridLayout_100">
              <item row="0" column="1">
               <widget class="QDoubleSpinBox" name="doubleSpinBox_Heisenberg_dd_radius">
@@ -1984,8 +1988,8 @@
              </item>
             </layout>
            </item>
-           <item row="12" column="1">
-            <spacer name="verticalSpacer_26">
+           <item row="22" column="1">
+            <spacer name="verticalSpacer_23">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
              </property>
@@ -2016,39 +2020,38 @@
              </property>
             </spacer>
            </item>
-           <item row="1" column="1">
-            <layout class="QGridLayout" name="gridLayout_94">
+           <item row="21" column="1">
+            <layout class="QGridLayout" name="gridLayout_93">
              <item row="0" column="0">
-              <widget class="QLabel" name="label_73">
+              <widget class="QCheckBox" name="checkBox_Heisenberg_fsc">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="text">
-                <string>Delta</string>
+                <string>FSC</string>
                </property>
               </widget>
              </item>
-             <item row="0" column="1">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_Heisenberg_delta">
-               <property name="locale">
-                <locale language="C" country="AnyCountry"/>
+            </layout>
+           </item>
+           <item row="20" column="1">
+            <layout class="QGridLayout" name="gridLayout_92">
+             <item row="0" column="0">
+              <widget class="QCheckBox" name="checkBox_Heisenberg_bqe">
+               <property name="enabled">
+                <bool>false</bool>
                </property>
-               <property name="decimals">
-                <number>4</number>
-               </property>
-               <property name="minimum">
-                <double>0.000100000000000</double>
-               </property>
-               <property name="maximum">
-                <double>100.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.100000000000000</double>
-               </property>
-               <property name="value">
-                <double>1.000000000000000</double>
+               <property name="text">
+                <string>BQE</string>
                </property>
               </widget>
              </item>
-             <item row="0" column="2">
-              <spacer name="horizontalSpacer_46">
+            </layout>
+           </item>
+           <item row="16" column="1">
+            <layout class="QGridLayout" name="gridLayout_91">
+             <item row="0" column="3">
+              <spacer name="horizontalSpacer_55">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
@@ -2059,6 +2062,54 @@
                 </size>
                </property>
               </spacer>
+             </item>
+             <item row="0" column="0">
+              <widget class="QCheckBox" name="checkBox_Heisenberg_dmi">
+               <property name="text">
+                <string>DMI</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <layout class="QGridLayout" name="gridLayout_98">
+               <item row="0" column="2">
+                <widget class="QSpinBox" name="spinBox_Heisenberg_dmi_nshells">
+                 <property name="minimum">
+                  <number>1</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="0">
+                <spacer name="horizontalSpacer_57">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Minimum</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLabel" name="label_74">
+                 <property name="text">
+                  <string>Number of Shells</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="1" column="2">
+              <layout class="QVBoxLayout" name="layout_Heisenberg_dmi">
+               <property name="sizeConstraint">
+                <enum>QLayout::SetMinimumSize</enum>
+               </property>
+              </layout>
              </item>
             </layout>
            </item>
@@ -2075,8 +2126,64 @@
              </property>
             </spacer>
            </item>
-           <item row="2" column="1">
-            <spacer name="verticalSpacer_29">
+           <item row="0" column="1">
+            <layout class="QGridLayout" name="gridLayout_55">
+             <item row="1" column="1">
+              <widget class="QLabel" name="label_40">
+               <property name="text">
+                <string>Apply to</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2">
+              <widget class="QComboBox" name="comboBox_Heisenberg_ApplyTo">
+               <property name="minimumSize">
+                <size>
+                 <width>120</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <item>
+                <property name="text">
+                 <string>Current Image</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Current Image Chain</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>All Images</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="1" column="3">
+              <spacer name="horizontalSpacer_45">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="3" column="1">
+            <widget class="QCheckBox" name="checkBox_Heisenberg_periodical_a">
+             <property name="text">
+              <string>Periodical a</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <spacer name="verticalSpacer_24">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
              </property>
@@ -2091,39 +2198,12 @@
              </property>
             </spacer>
            </item>
-           <item row="13" column="1">
-            <layout class="QGridLayout" name="gridLayout_96">
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_72">
-               <property name="text">
-                <string>Number of Shells</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="2">
-              <spacer name="horizontalSpacer_54">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="0" column="1">
-              <widget class="QSpinBox" name="spinBox_Heisenberg_n_shells">
-               <property name="locale">
-                <locale language="C" country="AnyCountry"/>
-               </property>
-               <property name="maximum">
-                <number>99</number>
-               </property>
-              </widget>
-             </item>
-            </layout>
+           <item row="4" column="1">
+            <widget class="QCheckBox" name="checkBox_Heisenberg_periodical_b">
+             <property name="text">
+              <string>Periodical b</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>

@@ -172,7 +172,7 @@ void Hamiltonian_Set_Exchange(State *state, int n_shells, const float* jij, int 
 	image->Unlock();
 }
 
-void Hamiltonian_Set_DMI(State *state, float dij, int idx_image, int idx_chain)
+void Hamiltonian_Set_DMI(State *state, int n_shells, const float* dij, int idx_image, int idx_chain)
 {
     std::shared_ptr<Data::Spin_System> image;
     std::shared_ptr<Data::Spin_System_Chain> chain;
@@ -225,6 +225,22 @@ void Hamiltonian_Set_FSC(State *state, float kijkl, int idx_image, int idx_chain
     if (image->hamiltonian->Name() == "Heisenberg")
     {
         Log(Utility::Log_Level::Error, Utility::Log_Sender::API, "FSC is not implemented in Hamiltonian_Heisenberg - use Quadruplet interaction instead!");
+    }
+
+	image->Unlock();
+}
+
+void Hamiltonian_Set_DDI_Radius(State *state, float r_dd, int idx_image, int idx_chain)
+{
+    std::shared_ptr<Data::Spin_System> image;
+    std::shared_ptr<Data::Spin_System_Chain> chain;
+    from_indices(state, idx_image, idx_chain, image, chain);
+
+	image->Lock();
+
+    if (image->hamiltonian->Name() == "Heisenberg")
+    {
+        Log(Utility::Log_Level::Error, Utility::Log_Sender::API, "DDI is not implemented in Hamiltonian_Heisenberg!");
     }
 
 	image->Unlock();
@@ -297,18 +313,6 @@ void Hamiltonian_Get_Field(State *state, float * magnitude, float * normal, int 
     }
 }
 
-void Hamiltonian_Get_Exchange(State *state, int * n_shells, float * jij, int idx_image, int idx_chain)
-{
-    std::shared_ptr<Data::Spin_System> image;
-    std::shared_ptr<Data::Spin_System_Chain> chain;
-    from_indices(state, idx_image, idx_chain, image, chain);
-
-    if (image->hamiltonian->Name() == "Heisenberg")
-    {
-        // TODO
-    }
-}
-
 void Hamiltonian_Get_Anisotropy(State *state, float * magnitude, float * normal, int idx_image, int idx_chain)
 {
     std::shared_ptr<Data::Spin_System> image;
@@ -339,7 +343,7 @@ void Hamiltonian_Get_Anisotropy(State *state, float * magnitude, float * normal,
     }
 }
 
-void Hamiltonian_Get_DMI(State *state, float * dij, int idx_image, int idx_chain)
+void Hamiltonian_Get_Exchange(State *state, int * n_shells, float * jij, int idx_image, int idx_chain)
 {
     std::shared_ptr<Data::Spin_System> image;
     std::shared_ptr<Data::Spin_System_Chain> chain;
@@ -351,7 +355,7 @@ void Hamiltonian_Get_DMI(State *state, float * dij, int idx_image, int idx_chain
     }
 }
 
-void Hamiltonian_Get_BQE(State *state, float * bij, int idx_image, int idx_chain)
+void Hamiltonian_Get_DMI(State *state, int * n_shells, float * dij, int idx_image, int idx_chain)
 {
     std::shared_ptr<Data::Spin_System> image;
     std::shared_ptr<Data::Spin_System_Chain> chain;
@@ -363,7 +367,7 @@ void Hamiltonian_Get_BQE(State *state, float * bij, int idx_image, int idx_chain
     }
 }
 
-void Hamiltonian_Get_FSC(State *state, float * kijkl, int idx_image, int idx_chain)
+float Hamiltonian_Get_BQE(State *state, float * bij, int idx_image, int idx_chain)
 {
     std::shared_ptr<Data::Spin_System> image;
     std::shared_ptr<Data::Spin_System_Chain> chain;
@@ -373,4 +377,31 @@ void Hamiltonian_Get_FSC(State *state, float * kijkl, int idx_image, int idx_cha
     {
         // TODO
     }
+    return 0;
+}
+
+float Hamiltonian_Get_FSC(State *state, float * kijkl, int idx_image, int idx_chain)
+{
+    std::shared_ptr<Data::Spin_System> image;
+    std::shared_ptr<Data::Spin_System_Chain> chain;
+    from_indices(state, idx_image, idx_chain, image, chain);
+
+    if (image->hamiltonian->Name() == "Heisenberg")
+    {
+        // TODO
+    }
+    return 0;
+}
+
+float Hamiltonian_Get_DDI_Radius(State *state, int idx_image, int idx_chain)
+{
+    std::shared_ptr<Data::Spin_System> image;
+    std::shared_ptr<Data::Spin_System_Chain> chain;
+    from_indices(state, idx_image, idx_chain, image, chain);
+
+    if (image->hamiltonian->Name() == "Heisenberg")
+    {
+        // TODO
+    }
+    return 0;
 }
