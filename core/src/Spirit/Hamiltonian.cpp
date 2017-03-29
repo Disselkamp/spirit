@@ -37,18 +37,15 @@ void Hamiltonian_Set_mu_s(State *state, float mu_s, int idx_image, int idx_chain
     std::shared_ptr<Data::Spin_System_Chain> chain;
     from_indices(state, idx_image, idx_chain, image, chain);
 
-	image->Lock();
-
     if (image->hamiltonian->Name() == "Heisenberg")
     {
+	    image->Lock();
         auto ham = (Engine::Hamiltonian_Heisenberg*)image->hamiltonian.get();
         for (auto& m : ham->mu_s) m = mu_s;
+        Log(Utility::Log_Level::Info, Utility::Log_Sender::API,
+            "Set mu_s to " + std::to_string(mu_s), idx_image, idx_chain);
+	    image->Unlock();
     }
-
-	Log(Utility::Log_Level::Info, Utility::Log_Sender::API,
-        "Set mu_s to " + std::to_string(mu_s), idx_image, idx_chain);
-
-	image->Unlock();
 }
 
 void Hamiltonian_Set_Field(State *state, float magnitude, const float * normal, int idx_image, int idx_chain)
@@ -57,12 +54,11 @@ void Hamiltonian_Set_Field(State *state, float magnitude, const float * normal, 
     std::shared_ptr<Data::Spin_System_Chain> chain;
     from_indices(state, idx_image, idx_chain, image, chain);
 
-	// Lock mutex because simulations may be running
-	image->Lock();
-
 	// Set
     if (image->hamiltonian->Name() == "Heisenberg")
     {
+	    image->Lock();
+
         auto ham = (Engine::Hamiltonian_Heisenberg*)image->hamiltonian.get();
         int nos = image->nos;
 
@@ -91,13 +87,13 @@ void Hamiltonian_Set_Field(State *state, float magnitude, const float * normal, 
 
         // Update Energies
         ham->Update_Energy_Contributions();
+
+	    image->Unlock();
+
+        Log(Utility::Log_Level::Info, Utility::Log_Sender::API,
+            "Set external field to " + std::to_string(magnitude) + ", direction (" + std::to_string(normal[0]) + "," + std::to_string(normal[1]) + "," + std::to_string(normal[2]) + ")", idx_image, idx_chain);
     }
     
-	Log(Utility::Log_Level::Info, Utility::Log_Sender::API,
-        "Set external field to " + std::to_string(magnitude) + ", direction (" + std::to_string(normal[0]) + "," + std::to_string(normal[1]) + "," + std::to_string(normal[2]) + ")", idx_image, idx_chain);
-
-	// Unlock mutex
-	image->Unlock();
 }
 
 void Hamiltonian_Set_Anisotropy(State *state, float magnitude, const float * normal, int idx_image, int idx_chain)
@@ -106,10 +102,11 @@ void Hamiltonian_Set_Anisotropy(State *state, float magnitude, const float * nor
     std::shared_ptr<Data::Spin_System_Chain> chain;
     from_indices(state, idx_image, idx_chain, image, chain);
 
-	image->Lock();
 
     if (image->hamiltonian->Name() == "Heisenberg")
     {
+	    image->Lock();
+
 		auto ham = (Engine::Hamiltonian_Heisenberg*)image->hamiltonian.get();
 		int nos = image->nos;
 
@@ -138,12 +135,13 @@ void Hamiltonian_Set_Anisotropy(State *state, float magnitude, const float * nor
 
 		// Update Energies
 		ham->Update_Energy_Contributions();
+
+	    image->Unlock();
+
+        Log(Utility::Log_Level::Info, Utility::Log_Sender::API,
+            "Set anisotropy to " + std::to_string(magnitude) + ", direction (" + std::to_string(normal[0]) + "," + std::to_string(normal[1]) + "," + std::to_string(normal[2]) + ")", idx_image, idx_chain);
     }
 
-	Log(Utility::Log_Level::Info, Utility::Log_Sender::API,
-        "Set anisotropy to " + std::to_string(magnitude) + ", direction (" + std::to_string(normal[0]) + "," + std::to_string(normal[1]) + "," + std::to_string(normal[2]) + ")", idx_image, idx_chain);
-
-	image->Unlock();
 }
 
 void Hamiltonian_Set_Exchange(State *state, int n_shells, const float* jij, int idx_image, int idx_chain)
@@ -152,10 +150,10 @@ void Hamiltonian_Set_Exchange(State *state, int n_shells, const float* jij, int 
     std::shared_ptr<Data::Spin_System_Chain> chain;
     from_indices(state, idx_image, idx_chain, image, chain);
 
-	image->Lock();
-
     if (image->hamiltonian->Name() == "Heisenberg")
     {
+	    image->Lock();
+
 		auto ham = (Engine::Hamiltonian_Heisenberg*)image->hamiltonian.get();
 
 		// for (int i_periodicity = 0; i_periodicity < 8; ++i_periodicity)
@@ -165,11 +163,12 @@ void Hamiltonian_Set_Exchange(State *state, int n_shells, const float* jij, int 
 		// 		ham->Exchange_magnitude[i_periodicity][i] = jij[0];
 		// 	}
 		// }
+        Log(Utility::Log_Level::Error, Utility::Log_Sender::API, "Exchange is not implemented in Hamiltonian_Heisenberg");
 		
 		ham->Update_Energy_Contributions();
-    }
 
-	image->Unlock();
+	    image->Unlock();
+    }
 }
 
 void Hamiltonian_Set_DMI(State *state, int n_shells, const float* dij, int idx_image, int idx_chain)
@@ -178,10 +177,10 @@ void Hamiltonian_Set_DMI(State *state, int n_shells, const float* dij, int idx_i
     std::shared_ptr<Data::Spin_System_Chain> chain;
     from_indices(state, idx_image, idx_chain, image, chain);
 
-	image->Lock();
-
     if (image->hamiltonian->Name() == "Heisenberg")
     {
+	    image->Lock();
+        
 		auto ham = (Engine::Hamiltonian_Heisenberg*)image->hamiltonian.get();
 
 		// for (int i_periodicity = 0; i_periodicity < 8; ++i_periodicity)
@@ -191,11 +190,12 @@ void Hamiltonian_Set_DMI(State *state, int n_shells, const float* dij, int idx_i
 		// 		ham->DMI_magnitude[i_periodicity][i] = dij;
 		// 	}
 		// }
-
+        Log(Utility::Log_Level::Error, Utility::Log_Sender::API, "DMI is not implemented in Hamiltonian_Heisenberg");
+	    
 		ham->Update_Energy_Contributions();
-    }
 
-	image->Unlock();
+	    image->Unlock();
+    }
 }
 
 void Hamiltonian_Set_BQE(State *state, float bij, int idx_image, int idx_chain)
@@ -204,14 +204,12 @@ void Hamiltonian_Set_BQE(State *state, float bij, int idx_image, int idx_chain)
     std::shared_ptr<Data::Spin_System_Chain> chain;
     from_indices(state, idx_image, idx_chain, image, chain);
 
-	image->Lock();
-
     if (image->hamiltonian->Name() == "Heisenberg")
     {
+	    image->Lock();
         Log(Utility::Log_Level::Error, Utility::Log_Sender::API, "BQE is not implemented in Hamiltonian_Heisenberg - use Quadruplet interaction instead!");
+	    image->Unlock();
     }
-
-	image->Unlock();
 }
 
 void Hamiltonian_Set_FSC(State *state, float kijkl, int idx_image, int idx_chain)
@@ -220,14 +218,12 @@ void Hamiltonian_Set_FSC(State *state, float kijkl, int idx_image, int idx_chain
     std::shared_ptr<Data::Spin_System_Chain> chain;
     from_indices(state, idx_image, idx_chain, image, chain);
 
-	image->Lock();
-
     if (image->hamiltonian->Name() == "Heisenberg")
     {
+	    image->Lock();
         Log(Utility::Log_Level::Error, Utility::Log_Sender::API, "FSC is not implemented in Hamiltonian_Heisenberg - use Quadruplet interaction instead!");
+	    image->Unlock();
     }
-
-	image->Unlock();
 }
 
 void Hamiltonian_Set_DDI_Radius(State *state, float r_dd, int idx_image, int idx_chain)
@@ -236,14 +232,12 @@ void Hamiltonian_Set_DDI_Radius(State *state, float r_dd, int idx_image, int idx
     std::shared_ptr<Data::Spin_System_Chain> chain;
     from_indices(state, idx_image, idx_chain, image, chain);
 
-	image->Lock();
-
     if (image->hamiltonian->Name() == "Heisenberg")
     {
+	    image->Lock();
         Log(Utility::Log_Level::Error, Utility::Log_Sender::API, "DDI is not implemented in Hamiltonian_Heisenberg!");
+	    image->Unlock();
     }
-
-	image->Unlock();
 }
 
 /*------------------------------------------------------------------------------------------------------ */
@@ -352,6 +346,7 @@ void Hamiltonian_Get_Exchange(State *state, int * n_shells, float * jij, int idx
     if (image->hamiltonian->Name() == "Heisenberg")
     {
         // TODO
+        Log(Utility::Log_Level::Error, Utility::Log_Sender::API, "Exchange is not implemented in Hamiltonian_Heisenberg");
     }
 }
 
@@ -364,6 +359,7 @@ void Hamiltonian_Get_DMI(State *state, int * n_shells, float * dij, int idx_imag
     if (image->hamiltonian->Name() == "Heisenberg")
     {
         // TODO
+        Log(Utility::Log_Level::Error, Utility::Log_Sender::API, "DMI is not implemented in Hamiltonian_Heisenberg");
     }
 }
 
@@ -376,6 +372,7 @@ float Hamiltonian_Get_BQE(State *state, float * bij, int idx_image, int idx_chai
     if (image->hamiltonian->Name() == "Heisenberg")
     {
         // TODO
+        Log(Utility::Log_Level::Error, Utility::Log_Sender::API, "BQE is not implemented in Hamiltonian_Heisenberg");
     }
     return 0;
 }
@@ -389,6 +386,7 @@ float Hamiltonian_Get_FSC(State *state, float * kijkl, int idx_image, int idx_ch
     if (image->hamiltonian->Name() == "Heisenberg")
     {
         // TODO
+        Log(Utility::Log_Level::Error, Utility::Log_Sender::API, "FSC is not implemented in Hamiltonian_Heisenberg");
     }
     return 0;
 }
@@ -402,6 +400,7 @@ float Hamiltonian_Get_DDI_Radius(State *state, int idx_image, int idx_chain)
     if (image->hamiltonian->Name() == "Heisenberg")
     {
         // TODO
+        Log(Utility::Log_Level::Error, Utility::Log_Sender::API, "DDI is not implemented in Hamiltonian_Heisenberg");
     }
     return 0;
 }
