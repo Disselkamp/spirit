@@ -62,12 +62,12 @@ SettingsWidget::SettingsWidget(std::shared_ptr<State> state, SpinWidget *spinWid
 
 	// Setup Interactions Tab
 	std::string H_name = Hamiltonian_Get_Name(state.get());
-	if (H_name == "Heisenberg") this->tabWidget_Settings->removeTab(2);
-	else
-	{
-		this->tabWidget_Settings->removeTab(2);
-		this->tabWidget_Settings->removeTab(2);
-	}
+	// if (H_name == "Heisenberg") this->tabWidget_Settings->removeTab(2);
+	// else
+	// {
+		this->tabWidget_Settings->removeTab(3);
+		this->tabWidget_Settings->removeTab(3);
+	// }
 
 	// Load information from Spin Systems
 	this->updateData();
@@ -85,7 +85,13 @@ void SettingsWidget::updateData()
 {
 	// Load Hamiltonian Contents
 	std::string H_name = Hamiltonian_Get_Name(state.get());
-	if (H_name == "Heisenberg") this->Load_Hamiltonian_Heisenberg_Contents();
+	if (H_name == "Heisenberg")
+	{
+		this->Load_Hamiltonian_Heisenberg_Contents();
+	}
+	else if (H_name == "Gaussian")
+	{
+	}
 	// Load Parameters Contents
 	this->Load_Parameters_Contents();
 	// ToDo: Also update Debug etc!
@@ -384,9 +390,22 @@ void SettingsWidget::homogeneousTransitionPressed()
 
 void SettingsWidget::Load_Parameters_Contents()
 {
-	float d;
+	float d, vd[3];
 	int image_type;
 	int i;
+
+	// Spin polarised current
+	Hamiltonian_Get_STT(state.get(), &d, vd);
+	if (d > 0.0) this->checkBox_Parameters_STT->setChecked(true);
+	this->doubleSpinBox_Parameters_STT->textFromValue(d);
+	this->doubleSpinBox_Parameters_STT_direction_x->textFromValue(vd[0]);
+	this->doubleSpinBox_Parameters_STT_direction_y->textFromValue(vd[1]);
+	this->doubleSpinBox_Parameters_STT_direction_z->textFromValue(vd[2]);
+
+	// Temperature
+	Hamiltonian_Get_Temperature(state.get(), &d);
+	if (d > 0.0) this->checkBox_Parameters_temperature->setChecked(true);
+	this->doubleSpinBox_Parameters_temperature->textFromValue(d);
 
 	// LLG Damping
 	Parameters_Get_LLG_Damping(state.get(), &d);
@@ -429,42 +448,36 @@ void SettingsWidget::Load_Hamiltonian_Heisenberg_Contents()
 	// Boundary conditions
 	bool boundary_conditions[3];
 	Hamiltonian_Get_Boundary_Conditions(state.get(), boundary_conditions);
-	this->checkBox_aniso_periodical_a->setChecked(boundary_conditions[0]);
-	this->checkBox_aniso_periodical_b->setChecked(boundary_conditions[1]);
-	this->checkBox_aniso_periodical_c->setChecked(boundary_conditions[2]);
-
-	// mu_s
-	Hamiltonian_Get_mu_s(state.get(), &mu_s);
-	this->lineEdit_muSpin_aniso->setText(QString::number(mu_s));
+	this->checkBox_Heisenberg_periodical_a->setChecked(boundary_conditions[0]);
+	this->checkBox_Heisenberg_periodical_b->setChecked(boundary_conditions[1]);
+	this->checkBox_Heisenberg_periodical_c->setChecked(boundary_conditions[2]);
 
 	// External magnetic field
 	Hamiltonian_Get_Field(state.get(), &d, vd);
-	this->lineEdit_extH_aniso->setText(QString::number(d));
-	this->lineEdit_extHx_aniso->setText(QString::number(vd[0]));
-	this->lineEdit_extHy_aniso->setText(QString::number(vd[1]));
-	this->lineEdit_extHz_aniso->setText(QString::number(vd[2]));
-	if (d > 0.0) this->checkBox_extH_aniso->setChecked(true);
+	if (d > 0.0) this->checkBox_Heisenberg_field->setChecked(true);
+	this->doubleSpinBox_Heisenberg_field_magnitude->textFromValue(d);
+	this->doubleSpinBox_Heisenberg_field_direction_x->textFromValue(vd[0]);
+	this->doubleSpinBox_Heisenberg_field_direction_y->textFromValue(vd[1]);
+	this->doubleSpinBox_Heisenberg_field_direction_z->textFromValue(vd[2]);
+	// mu_s
+	Hamiltonian_Get_mu_s(state.get(), &mu_s);
+	this->doubleSpinBox_Heisenberg_mu_s->textFromValue(mu_s);
 
 	// Anisotropy
 	Hamiltonian_Get_Anisotropy(state.get(), &d, vd);
-	this->lineEdit_ani_aniso->setText(QString::number(d));
-	this->lineEdit_anix_aniso->setText(QString::number(vd[0]));
-	this->lineEdit_aniy_aniso->setText(QString::number(vd[1]));
-	this->lineEdit_aniz_aniso->setText(QString::number(vd[2]));
-	if (d > 0.0) this->checkBox_ani_aniso->setChecked(true);
+	if (d > 0.0) this->checkBox_Heisenberg_anisotropy->setChecked(true);
+	this->doubleSpinBox_Heisenberg_anisotropy_magnitude->textFromValue(d);
+	this->doubleSpinBox_Heisenberg_anisotropy_direction_x->textFromValue(vd[0]);
+	this->doubleSpinBox_Heisenberg_anisotropy_direction_y->textFromValue(vd[1]);
+	this->doubleSpinBox_Heisenberg_anisotropy_direction_z->textFromValue(vd[2]);
 
-	// Spin polarised current
-	Hamiltonian_Get_STT(state.get(), &d, vd);
-	this->lineEdit_stt_aniso->setText(QString::number(d));
-	this->lineEdit_sttx_aniso->setText(QString::number(vd[0]));
-	this->lineEdit_stty_aniso->setText(QString::number(vd[1]));
-	this->lineEdit_sttz_aniso->setText(QString::number(vd[2]));
-	if (d > 0.0) this->checkBox_stt_aniso->setChecked(true);
+	// Number of Shells
 
-	// Temperature
-	Hamiltonian_Get_Temperature(state.get(), &d);
-	this->lineEdit_T_aniso->setText(QString::number(d));
-	if (d > 0.0) this->checkBox_T_aniso->setChecked(true);
+	// Exchange
+
+	// DMI
+
+	// Dipole-dipole
 }
 
 void SettingsWidget::Load_Visualization_Contents()
@@ -657,6 +670,17 @@ void SettingsWidget::Load_Visualization_Contents()
 // -----------------------------------------------------------------------------------
 // --------------------- Setters for Hamiltonians and Parameters ---------------------
 // -----------------------------------------------------------------------------------
+
+
+void SettingsWidget::Heisenberg_Add_Shell(float exchange, float dmi)
+{
+
+}
+
+void SettingsWidget::Heisenberg_Remove_Shell()
+{
+
+}
 
 
 void SettingsWidget::set_parameters()
@@ -882,31 +906,31 @@ void SettingsWidget::set_hamiltonian_iso()
 	}
 }
 
-void SettingsWidget::set_hamiltonian_aniso_bc()
+void SettingsWidget::set_heisenberg_bc()
 {
 	// Closure to set the parameters of a specific spin system
 	auto apply = [this](int idx_image, int idx_chain) -> void
 	{
 		// Boundary conditions
 		bool boundary_conditions[3];
-		boundary_conditions[0] = this->checkBox_aniso_periodical_a->isChecked();
-		boundary_conditions[1] = this->checkBox_aniso_periodical_b->isChecked();
-		boundary_conditions[2] = this->checkBox_aniso_periodical_c->isChecked();
+		boundary_conditions[0] = this->checkBox_Heisenberg_periodical_a->isChecked();
+		boundary_conditions[1] = this->checkBox_Heisenberg_periodical_b->isChecked();
+		boundary_conditions[2] = this->checkBox_Heisenberg_periodical_c->isChecked();
 		Hamiltonian_Set_Boundary_Conditions(state.get(), boundary_conditions, idx_image, idx_chain);
 	};
 	
-	if (this->comboBox_Hamiltonian_Ani_ApplyTo->currentText() == "Current Image")
+	if (this->comboBox_Heisenberg_ApplyTo->currentText() == "Current Image")
 	{
 		apply(System_Get_Index(state.get()), Chain_Get_Index(state.get()));
 	}
-	else if (this->comboBox_Hamiltonian_Ani_ApplyTo->currentText() == "Current Image Chain")
+	else if (this->comboBox_Heisenberg_ApplyTo->currentText() == "Current Image Chain")
 	{
 		for (int i=0; i<Chain_Get_NOI(state.get()); ++i)
 		{
 			apply(i, Chain_Get_Index(state.get()));
 		}
 	}
-	else if (this->comboBox_Hamiltonian_Ani_ApplyTo->currentText() == "All Images")
+	else if (this->comboBox_Heisenberg_ApplyTo->currentText() == "All Images")
 	{
 		for (int ichain=0; ichain<Collection_Get_NOC(state.get()); ++ichain)
 		{
@@ -1664,9 +1688,9 @@ void SettingsWidget::print_Energies_to_console()
 void SettingsWidget::Setup_Hamiltonian_Heisenberg_Slots()
 {
 	// Boundary Conditions
-	connect(this->checkBox_aniso_periodical_a, SIGNAL(stateChanged(int)), this, SLOT(set_hamiltonian_aniso_bc()));
-	connect(this->checkBox_aniso_periodical_b, SIGNAL(stateChanged(int)), this, SLOT(set_hamiltonian_aniso_bc()));
-	connect(this->checkBox_aniso_periodical_c, SIGNAL(stateChanged(int)), this, SLOT(set_hamiltonian_aniso_bc()));
+	connect(this->checkBox_Heisenberg_periodical_a, SIGNAL(stateChanged(int)), this, SLOT(set_heisenberg_bc()));
+	connect(this->checkBox_Heisenberg_periodical_b, SIGNAL(stateChanged(int)), this, SLOT(set_heisenberg_bc()));
+	connect(this->checkBox_Heisenberg_periodical_c, SIGNAL(stateChanged(int)), this, SLOT(set_heisenberg_bc()));
 	// mu_s
 	connect(this->lineEdit_muSpin_aniso, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_aniso_mu_s()));
 	// External Field

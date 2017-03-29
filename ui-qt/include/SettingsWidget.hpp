@@ -42,7 +42,11 @@ private:
 	void Load_Hamiltonian_Heisenberg_Contents();
 	void Load_Parameters_Contents();
 	void Load_Visualization_Contents();
-	// Validator for Input into lineEdits
+	void Heisenberg_Add_Shell(float exchange, float dmi);
+	void Heisenberg_Remove_Shell();
+	// Variable lists for exchange and dmi
+	std::vector<QDoubleSpinBox *> spinBoxes_dmi, spinBoxes_exchange;
+	// Validators for Input into lineEdits
 	QRegularExpressionValidator * number_validator;
 	QRegularExpressionValidator * number_validator_unsigned;
 	QRegularExpressionValidator * number_validator_int;
@@ -62,8 +66,7 @@ private slots:
 	void set_parameters();
 	// Configurations
 	void set_hamiltonian_iso();
-	// void set_hamiltonian_aniso();
-	void set_hamiltonian_aniso_bc();
+	void set_heisenberg_bc();
 	void set_hamiltonian_aniso_mu_s();
 	void set_hamiltonian_aniso_field();
 	void set_hamiltonian_aniso_ani();

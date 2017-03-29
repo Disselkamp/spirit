@@ -3,6 +3,7 @@
 #define HAMILTONIAN_HEISENBERG_H
 
 #include <vector>
+#include <memory>
 
 #include "Spirit_Defines.h"
 #include <engine/Vectormath_Defines.hpp>
