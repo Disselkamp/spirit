@@ -76,6 +76,11 @@ void Hamiltonian_Set_Field(State *state, float magnitude, const float * normal, 
         }
         // Normals
         Vector3 new_normal{normal[0], normal[1], normal[2]};
+        if (new_normal.norm() < 1e-8)
+        {
+            new_normal = { 0,0,1 };
+            Log(Utility::Log_Level::Warning, Utility::Log_Sender::API, "external field = {0,0,0} replaced by {0,0,1}");
+        }
         new_normal.normalize();
         vectorfield new_normals(nos, new_normal);
         
@@ -118,6 +123,11 @@ void Hamiltonian_Set_Anisotropy(State *state, float magnitude, const float * nor
 		}
 		// Normals
 		Vector3 new_normal{ normal[0], normal[1], normal[2] };
+        if (new_normal.norm() < 1e-8)
+        {
+            new_normal = { 0,0,1 };
+            Log(Utility::Log_Level::Warning, Utility::Log_Sender::API, "anisotropy = {0,0,0} replaced by {0,0,1}");
+        }
 		new_normal.normalize();
 		vectorfield new_normals(nos, new_normal);
 
@@ -216,49 +226,6 @@ void Hamiltonian_Set_FSC(State *state, float kijkl, int idx_image, int idx_chain
     {
         Log(Utility::Log_Level::Error, Utility::Log_Sender::API, "FSC is not implemented in Hamiltonian_Heisenberg - use Quadruplet interaction instead!");
     }
-
-	image->Unlock();
-}
-
-void Hamiltonian_Set_STT(State *state, float magnitude, const float * normal, int idx_image, int idx_chain)
-{
-    std::shared_ptr<Data::Spin_System> image;
-    std::shared_ptr<Data::Spin_System_Chain> chain;
-    from_indices(state, idx_image, idx_chain, image, chain);
-
-	image->Lock();
-
-    // Magnitude
-    image->llg_parameters->stt_magnitude = magnitude;
-    // Normal
-    image->llg_parameters->stt_polarisation_normal[0] = normal[0];
-    image->llg_parameters->stt_polarisation_normal[1] = normal[1];
-    image->llg_parameters->stt_polarisation_normal[2] = normal[2];
-	if (image->llg_parameters->stt_polarisation_normal.norm() < 0.9)
-	{
-		image->llg_parameters->stt_polarisation_normal = { 0,0,1 };
-		Log(Utility::Log_Level::Warning, Utility::Log_Sender::API, "s_c_vec = {0,0,0} replaced by {0,0,1}");
-	}
-	else image->llg_parameters->stt_polarisation_normal.normalize();
-
-	Log(Utility::Log_Level::Info, Utility::Log_Sender::API,
-        "Set spin current to " + std::to_string(magnitude) + ", direction (" + std::to_string(normal[0]) + "," + std::to_string(normal[1]) + "," + std::to_string(normal[2]) + ")", idx_image, idx_chain);
-
-	image->Unlock();
-}
-
-void Hamiltonian_Set_Temperature(State *state, float T, int idx_image, int idx_chain)
-{
-    std::shared_ptr<Data::Spin_System> image;
-    std::shared_ptr<Data::Spin_System_Chain> chain;
-    from_indices(state, idx_image, idx_chain, image, chain);
-
-	image->Lock();
-
-    image->llg_parameters->temperature = T;
-
-	Log(Utility::Log_Level::Info, Utility::Log_Sender::API,
-        "Set temperature to " + std::to_string(T), idx_image, idx_chain);
 
 	image->Unlock();
 }
@@ -406,27 +373,4 @@ void Hamiltonian_Get_FSC(State *state, float * kijkl, int idx_image, int idx_cha
     {
         // TODO
     }
-}
-
-void Hamiltonian_Get_STT(State *state, float * magnitude, float * normal, int idx_image, int idx_chain)
-{
-    std::shared_ptr<Data::Spin_System> image;
-    std::shared_ptr<Data::Spin_System_Chain> chain;
-    from_indices(state, idx_image, idx_chain, image, chain);
-
-    // Magnitude
-    *magnitude = (float)image->llg_parameters->stt_magnitude;
-    // Normal
-    normal[0] = (float)image->llg_parameters->stt_polarisation_normal[0];
-    normal[1] = (float)image->llg_parameters->stt_polarisation_normal[1];
-    normal[2] = (float)image->llg_parameters->stt_polarisation_normal[2];
-}
-
-void Hamiltonian_Get_Temperature(State *state, float * T, int idx_image, int idx_chain)
-{
-    std::shared_ptr<Data::Spin_System> image;
-    std::shared_ptr<Data::Spin_System_Chain> chain;
-    from_indices(state, idx_image, idx_chain, image, chain);
-
-    *T = (float)image->llg_parameters->temperature;
 }

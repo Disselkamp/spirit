@@ -1565,7 +1565,7 @@
              <item row="3" column="2">
               <widget class="QDoubleSpinBox" name="doubleSpinBox_Heisenberg_field_magnitude">
                <property name="minimum">
-                <double>-9999.000000000000000</double>
+                <double>0.000000000000000</double>
                </property>
                <property name="maximum">
                 <double>9999.000000000000000</double>
@@ -1589,6 +1589,9 @@
                </property>
                <property name="maximum">
                 <double>100.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>1.000000000000000</double>
                </property>
               </widget>
              </item>
@@ -1834,7 +1837,7 @@
                 <number>4</number>
                </property>
                <property name="minimum">
-                <double>-9999.000000000000000</double>
+                <double>0.000000000000000</double>
                </property>
                <property name="maximum">
                 <double>9999.000000000000000</double>
@@ -1858,6 +1861,9 @@
                </property>
                <property name="maximum">
                 <double>100.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>1.000000000000000</double>
                </property>
               </widget>
              </item>
@@ -2001,7 +2007,7 @@
                 <double>0.100000000000000</double>
                </property>
                <property name="value">
-                <double>0.100000000000000</double>
+                <double>1.000000000000000</double>
                </property>
               </widget>
              </item>
@@ -3401,7 +3407,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>100</height>
+               <height>150</height>
               </size>
              </property>
              <property name="maximumSize">
@@ -3550,6 +3556,9 @@
                   </property>
                   <property name="maximum">
                    <double>100.000000000000000</double>
+                  </property>
+                  <property name="value">
+                   <double>1.000000000000000</double>
                   </property>
                  </widget>
                 </item>

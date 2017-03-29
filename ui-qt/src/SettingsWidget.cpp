@@ -395,17 +395,17 @@ void SettingsWidget::Load_Parameters_Contents()
 	int i;
 
 	// Spin polarised current
-	Hamiltonian_Get_STT(state.get(), &d, vd);
+	Parameters_Get_LLG_STT(state.get(), &d, vd);
 	if (d > 0.0) this->checkBox_Parameters_STT->setChecked(true);
-	this->doubleSpinBox_Parameters_STT->textFromValue(d);
-	this->doubleSpinBox_Parameters_STT_direction_x->textFromValue(vd[0]);
-	this->doubleSpinBox_Parameters_STT_direction_y->textFromValue(vd[1]);
-	this->doubleSpinBox_Parameters_STT_direction_z->textFromValue(vd[2]);
+	this->doubleSpinBox_Parameters_STT->setValue(d);
+	this->doubleSpinBox_Parameters_STT_direction_x->setValue(vd[0]);
+	this->doubleSpinBox_Parameters_STT_direction_y->setValue(vd[1]);
+	this->doubleSpinBox_Parameters_STT_direction_z->setValue(vd[2]);
 
 	// Temperature
-	Hamiltonian_Get_Temperature(state.get(), &d);
+	Parameters_Get_LLG_Temperature(state.get(), &d);
 	if (d > 0.0) this->checkBox_Parameters_temperature->setChecked(true);
-	this->doubleSpinBox_Parameters_temperature->textFromValue(d);
+	this->doubleSpinBox_Parameters_temperature->setValue(d);
 
 	// LLG Damping
 	Parameters_Get_LLG_Damping(state.get(), &d);
@@ -455,21 +455,21 @@ void SettingsWidget::Load_Hamiltonian_Heisenberg_Contents()
 	// External magnetic field
 	Hamiltonian_Get_Field(state.get(), &d, vd);
 	if (d > 0.0) this->checkBox_Heisenberg_field->setChecked(true);
-	this->doubleSpinBox_Heisenberg_field_magnitude->textFromValue(d);
-	this->doubleSpinBox_Heisenberg_field_direction_x->textFromValue(vd[0]);
-	this->doubleSpinBox_Heisenberg_field_direction_y->textFromValue(vd[1]);
-	this->doubleSpinBox_Heisenberg_field_direction_z->textFromValue(vd[2]);
+	this->doubleSpinBox_Heisenberg_field_magnitude->setValue(d);
+	this->doubleSpinBox_Heisenberg_field_direction_x->setValue(vd[0]);
+	this->doubleSpinBox_Heisenberg_field_direction_y->setValue(vd[1]);
+	this->doubleSpinBox_Heisenberg_field_direction_z->setValue(vd[2]);
 	// mu_s
 	Hamiltonian_Get_mu_s(state.get(), &mu_s);
-	this->doubleSpinBox_Heisenberg_mu_s->textFromValue(mu_s);
+	this->doubleSpinBox_Heisenberg_mu_s->setValue(mu_s);
 
 	// Anisotropy
 	Hamiltonian_Get_Anisotropy(state.get(), &d, vd);
 	if (d > 0.0) this->checkBox_Heisenberg_anisotropy->setChecked(true);
-	this->doubleSpinBox_Heisenberg_anisotropy_magnitude->textFromValue(d);
-	this->doubleSpinBox_Heisenberg_anisotropy_direction_x->textFromValue(vd[0]);
-	this->doubleSpinBox_Heisenberg_anisotropy_direction_y->textFromValue(vd[1]);
-	this->doubleSpinBox_Heisenberg_anisotropy_direction_z->textFromValue(vd[2]);
+	this->doubleSpinBox_Heisenberg_anisotropy_magnitude->setValue(d);
+	this->doubleSpinBox_Heisenberg_anisotropy_direction_x->setValue(vd[0]);
+	this->doubleSpinBox_Heisenberg_anisotropy_direction_y->setValue(vd[1]);
+	this->doubleSpinBox_Heisenberg_anisotropy_direction_z->setValue(vd[2]);
 
 	// Number of Shells
 
@@ -688,9 +688,26 @@ void SettingsWidget::set_parameters()
 	// Closure to set the parameters of a specific spin system
 	auto apply = [this](int idx_image, int idx_chain) -> void
 	{
-		float d;
+		float d, vd[3];
 		int i;
 
+		// Spin polarised current
+		if (this->checkBox_Parameters_STT->isChecked())
+			d = this->doubleSpinBox_Parameters_STT->value();
+		else
+			d = 0;
+		vd[0] = this->doubleSpinBox_Parameters_STT_direction_x->value();
+		vd[1] = this->doubleSpinBox_Parameters_STT_direction_y->value();
+		vd[2] = this->doubleSpinBox_Parameters_STT_direction_z->value();
+		Parameters_Set_LLG_STT(state.get(), d, vd);
+
+		// Temperature
+		if (this->checkBox_Parameters_temperature->isChecked())
+			d = this->doubleSpinBox_Parameters_temperature->value();
+		else
+			d = 0;
+		Parameters_Set_LLG_Temperature(state.get(), d);
+		
 		// Time step [ps]
 		// dt = time_step [ps] * 10^-12 * gyromagnetic raio / mu_B  { / (1+damping^2)} <- not implemented
 		d = this->lineEdit_dt->text().toFloat();
@@ -846,41 +863,6 @@ void SettingsWidget::set_hamiltonian_iso()
 		if (this->checkBox_fourspin->isChecked()) d = this->lineEdit_fourspin->text().toFloat();
 		else d = 0.0;
 		Hamiltonian_Set_FSC(state.get(), d, idx_image, idx_chain);
-
-		// These belong in Parameters, not Hamiltonian
-		// Spin polarised current
-		if (this->checkBox_spin_torque->isChecked()) {
-			d = this->lineEdit_spin_torque->text().toFloat();
-		}
-		else {
-			d = 0.0;
-		}
-		vd[0] = lineEdit_spin_torquex->text().toFloat();
-		vd[1] = lineEdit_spin_torquey->text().toFloat();
-		vd[2] = lineEdit_spin_torquez->text().toFloat();
-		try {
-			normalize(vd);
-		}
-		catch (int ex) {
-			if (ex == Exception_Division_by_zero) {
-				vd[0] = 0.0;
-				vd[1] = 0.0;
-				vd[2] = 1.0;
-				Log_Send(state.get(), Log_Level_Warning, Log_Sender_UI, "s_c_vec = {0,0,0} replaced by {0,0,1}");
-				lineEdit_spin_torquex->setText(QString::number(0.0));
-				lineEdit_spin_torquey->setText(QString::number(0.0));
-				lineEdit_spin_torquez->setText(QString::number(1.0));
-			}
-			else { throw(ex); }
-		}
-		Hamiltonian_Set_STT(state.get(), d, vd, idx_image, idx_chain);
-
-		// Temperature
-		if (this->checkBox_Temperature->isChecked())
-			d = this->lineEdit_temper->text().toFloat();
-		else
-			d = 0.0;
-		Hamiltonian_Set_Temperature(state.get(), d, idx_image, idx_chain);
 	};
 
 	if (this->comboBox_Hamiltonian_Iso_ApplyTo->currentText() == "Current Image")
@@ -943,13 +925,13 @@ void SettingsWidget::set_heisenberg_bc()
 	this->_spinWidget->updateBoundingBoxIndicators();
 }
 
-void SettingsWidget::set_hamiltonian_aniso_mu_s()
+void SettingsWidget::set_heisenberg_mu_s()
 {
 	// Closure to set the parameters of a specific spin system
 	auto apply = [this](int idx_image, int idx_chain) -> void
 	{
 		// mu_s
-		float mu_s = this->lineEdit_muSpin_aniso->text().toFloat();
+		float mu_s = this->doubleSpinBox_Heisenberg_mu_s->value();
 		Hamiltonian_Set_mu_s(state.get(), mu_s, idx_image, idx_chain);
 	};
 	
@@ -976,7 +958,7 @@ void SettingsWidget::set_hamiltonian_aniso_mu_s()
 	}
 }
 
-void SettingsWidget::set_hamiltonian_aniso_field()
+void SettingsWidget::set_heisenberg_field()
 {
 	// Closure to set the parameters of a specific spin system
 	auto apply = [this](int idx_image, int idx_chain) -> void
@@ -985,42 +967,30 @@ void SettingsWidget::set_hamiltonian_aniso_field()
 
 		// External magnetic field
 		//		magnitude
-		if (this->checkBox_extH_aniso->isChecked()) d = this->lineEdit_extH_aniso->text().toFloat();
-		else d = 0.0;
+		if (this->checkBox_Heisenberg_field->isChecked())
+			d = this->doubleSpinBox_Heisenberg_field_magnitude->value();
+		else
+			d = 0.0;
 		//		normal
-		vd[0] = lineEdit_extHx_aniso->text().toFloat();
-		vd[1] = lineEdit_extHy_aniso->text().toFloat();
-		vd[2] = lineEdit_extHz_aniso->text().toFloat();
-		try {
-			normalize(vd);
-		}
-		catch (int ex) {
-			if (ex == Exception_Division_by_zero) {
-				vd[0] = 0.0;
-				vd[1] = 0.0;
-				vd[2] = 1.0;
-				Log_Send(state.get(), Log_Level_Warning, Log_Sender_UI, "B_vec = {0,0,0} replaced by {0,0,1}");
-				lineEdit_extHx_aniso->setText(QString::number(0.0));
-				lineEdit_extHy_aniso->setText(QString::number(0.0));
-				lineEdit_extHz_aniso->setText(QString::number(1.0));
-			}
-			else { throw(ex); }
-		}
+		vd[0] = this->doubleSpinBox_Heisenberg_field_direction_x->value();
+		vd[1] = this->doubleSpinBox_Heisenberg_field_direction_y->value();
+		vd[2] = this->doubleSpinBox_Heisenberg_field_direction_z->value();
+
 		Hamiltonian_Set_Field(state.get(), d, vd, idx_image, idx_chain);
 	};
 	
-	if (this->comboBox_Hamiltonian_Ani_ApplyTo->currentText() == "Current Image")
+	if (this->comboBox_Heisenberg_ApplyTo->currentText() == "Current Image")
 	{
 		apply(System_Get_Index(state.get()), Chain_Get_Index(state.get()));
 	}
-	else if (this->comboBox_Hamiltonian_Ani_ApplyTo->currentText() == "Current Image Chain")
+	else if (this->comboBox_Heisenberg_ApplyTo->currentText() == "Current Image Chain")
 	{
 		for (int i=0; i<Chain_Get_NOI(state.get()); ++i)
 		{
 			apply(i, Chain_Get_Index(state.get()));
 		}
 	}
-	else if (this->comboBox_Hamiltonian_Ani_ApplyTo->currentText() == "All Images")
+	else if (this->comboBox_Heisenberg_ApplyTo->currentText() == "All Images")
 	{
 		for (int ichain=0; ichain<Collection_Get_NOC(state.get()); ++ichain)
 		{
@@ -1032,7 +1002,7 @@ void SettingsWidget::set_hamiltonian_aniso_field()
 	}
 }
 
-void SettingsWidget::set_hamiltonian_aniso_ani()
+void SettingsWidget::set_heisenberg_anisotropy()
 {
 	// Closure to set the parameters of a specific spin system
 	auto apply = [this](int idx_image, int idx_chain) -> void
@@ -1041,135 +1011,29 @@ void SettingsWidget::set_hamiltonian_aniso_ani()
 
 		// Anisotropy
 		//		magnitude
-		if (this->checkBox_ani_aniso->isChecked()) d = this->lineEdit_ani_aniso->text().toFloat();
-		else d = 0.0;
+		if (this->checkBox_Heisenberg_anisotropy->isChecked())
+			d = this->doubleSpinBox_Heisenberg_anisotropy_magnitude->value();
+		else
+			d = 0.0;
 		//		normal
-		vd[0] = lineEdit_anix_aniso->text().toFloat();
-		vd[1] = lineEdit_aniy_aniso->text().toFloat();
-		vd[2] = lineEdit_aniz_aniso->text().toFloat();
-		try {
-			normalize(vd);
-		}
-		catch (int ex) {
-			if (ex == Exception_Division_by_zero) {
-				vd[0] = 0.0;
-				vd[1] = 0.0;
-				vd[2] = 1.0;
-				Log_Send(state.get(), Log_Level_Warning, Log_Sender_UI, "ani_vec = {0,0,0} replaced by {0,0,1}");
-				lineEdit_anix_aniso->setText(QString::number(0.0));
-				lineEdit_aniy_aniso->setText(QString::number(0.0));
-				lineEdit_aniz_aniso->setText(QString::number(1.0));
-			}
-			else { throw(ex); }
-		}
+		vd[0] = doubleSpinBox_Heisenberg_anisotropy_direction_x->value();
+		vd[1] = doubleSpinBox_Heisenberg_anisotropy_direction_y->value();
+		vd[2] = doubleSpinBox_Heisenberg_anisotropy_direction_z->value();
 		Hamiltonian_Set_Anisotropy(state.get(), d, vd, idx_image, idx_chain);
 	};
 	
-	if (this->comboBox_Hamiltonian_Ani_ApplyTo->currentText() == "Current Image")
+	if (this->comboBox_Heisenberg_ApplyTo->currentText() == "Current Image")
 	{
 		apply(System_Get_Index(state.get()), Chain_Get_Index(state.get()));
 	}
-	else if (this->comboBox_Hamiltonian_Ani_ApplyTo->currentText() == "Current Image Chain")
+	else if (this->comboBox_Heisenberg_ApplyTo->currentText() == "Current Image Chain")
 	{
 		for (int i=0; i<Chain_Get_NOI(state.get()); ++i)
 		{
 			apply(i, Chain_Get_Index(state.get()));
 		}
 	}
-	else if (this->comboBox_Hamiltonian_Ani_ApplyTo->currentText() == "All Images")
-	{
-		for (int ichain=0; ichain<Collection_Get_NOC(state.get()); ++ichain)
-		{
-			for (int img=0; img<Chain_Get_NOI(state.get(), ichain); ++img)
-			{
-				apply(img, ichain);
-			}
-		}
-	}
-}
-
-void SettingsWidget::set_hamiltonian_aniso_stt()
-{
-	// Closure to set the parameters of a specific spin system
-	auto apply = [this](int idx_image, int idx_chain) -> void
-	{
-		float d, vd[3];
-
-		// TODO: Make these anisotropic for Heisenberg Hamiltonian
-		//		 or move them to Parameters...
-		// Spin polarised current
-		if (this->checkBox_stt_aniso->isChecked())
-			d = this->lineEdit_stt_aniso->text().toFloat();
-		else d = 0.0;
-		vd[0] = lineEdit_sttx_aniso->text().toFloat();
-		vd[1] = lineEdit_stty_aniso->text().toFloat();
-		vd[2] = lineEdit_sttz_aniso->text().toFloat();
-		try {
-			normalize(vd);
-		}
-		catch (int ex) {
-			if (ex == Exception_Division_by_zero) {
-				vd[0] = 0.0;
-				vd[1] = 0.0;
-				vd[2] = 1.0;
-				Log_Send(state.get(), Log_Level_Warning, Log_Sender_UI, "s_c_vec = {0,0,0} replaced by {0,0,1}");
-				lineEdit_sttx_aniso->setText(QString::number(0.0));
-				lineEdit_stty_aniso->setText(QString::number(0.0));
-				lineEdit_sttz_aniso->setText(QString::number(1.0));
-			}
-			else { throw(ex); }
-		}
-		Hamiltonian_Set_STT(state.get(), d, vd, idx_image, idx_chain);
-	};
-	
-	if (this->comboBox_Hamiltonian_Ani_ApplyTo->currentText() == "Current Image")
-	{
-		apply(System_Get_Index(state.get()), Chain_Get_Index(state.get()));
-	}
-	else if (this->comboBox_Hamiltonian_Ani_ApplyTo->currentText() == "Current Image Chain")
-	{
-		for (int i=0; i<Chain_Get_NOI(state.get()); ++i)
-		{
-			apply(i, Chain_Get_Index(state.get()));
-		}
-	}
-	else if (this->comboBox_Hamiltonian_Ani_ApplyTo->currentText() == "All Images")
-	{
-		for (int ichain=0; ichain<Collection_Get_NOC(state.get()); ++ichain)
-		{
-			for (int img=0; img<Chain_Get_NOI(state.get(), ichain); ++img)
-			{
-				apply(img, ichain);
-			}
-		}
-	}
-}
-
-void SettingsWidget::set_hamiltonian_aniso_temp()
-{
-	// Closure to set the parameters of a specific spin system
-	auto apply = [this](int idx_image, int idx_chain) -> void
-	{
-		float d = 0.0;
-
-		// Temperature
-		if (this->checkBox_T_aniso->isChecked())
-			d = this->lineEdit_T_aniso->text().toFloat();
-		Hamiltonian_Set_Temperature(state.get(), d, idx_image, idx_chain);
-	};
-	
-	if (this->comboBox_Hamiltonian_Ani_ApplyTo->currentText() == "Current Image")
-	{
-		apply(System_Get_Index(state.get()), Chain_Get_Index(state.get()));
-	}
-	else if (this->comboBox_Hamiltonian_Ani_ApplyTo->currentText() == "Current Image Chain")
-	{
-		for (int i=0; i<Chain_Get_NOI(state.get()); ++i)
-		{
-			apply(i, Chain_Get_Index(state.get()));
-		}
-	}
-	else if (this->comboBox_Hamiltonian_Ani_ApplyTo->currentText() == "All Images")
+	else if (this->comboBox_Heisenberg_ApplyTo->currentText() == "All Images")
 	{
 		for (int ichain=0; ichain<Collection_Get_NOC(state.get()); ++ichain)
 		{
@@ -1692,32 +1556,32 @@ void SettingsWidget::Setup_Hamiltonian_Heisenberg_Slots()
 	connect(this->checkBox_Heisenberg_periodical_b, SIGNAL(stateChanged(int)), this, SLOT(set_heisenberg_bc()));
 	connect(this->checkBox_Heisenberg_periodical_c, SIGNAL(stateChanged(int)), this, SLOT(set_heisenberg_bc()));
 	// mu_s
-	connect(this->lineEdit_muSpin_aniso, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_aniso_mu_s()));
+	connect(this->doubleSpinBox_Heisenberg_mu_s, SIGNAL(valueChanged(double)), this, SLOT(set_heisenberg_mu_s()));
 	// External Field
-	connect(this->checkBox_extH_aniso, SIGNAL(stateChanged(int)), this, SLOT(set_hamiltonian_aniso_field()));
-	connect(this->lineEdit_extH_aniso, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_aniso_field()));
-	connect(this->lineEdit_extHx_aniso, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_aniso_field()));
-	connect(this->lineEdit_extHy_aniso, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_aniso_field()));
-	connect(this->lineEdit_extHz_aniso, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_aniso_field()));
+	connect(this->checkBox_Heisenberg_field, SIGNAL(stateChanged(int)), this, SLOT(set_heisenberg_field()));
+	connect(this->doubleSpinBox_Heisenberg_field_magnitude, SIGNAL(valueChanged(double)), this, SLOT(set_heisenberg_field()));
+	connect(this->doubleSpinBox_Heisenberg_field_direction_x, SIGNAL(valueChanged(double)), this, SLOT(set_heisenberg_field()));
+	connect(this->doubleSpinBox_Heisenberg_field_direction_y, SIGNAL(valueChanged(double)), this, SLOT(set_heisenberg_field()));
+	connect(this->doubleSpinBox_Heisenberg_field_direction_z, SIGNAL(valueChanged(double)), this, SLOT(set_heisenberg_field()));
 	// Anisotropy
-	connect(this->checkBox_ani_aniso, SIGNAL(stateChanged(int)), this, SLOT(set_hamiltonian_aniso_ani()));
-	connect(this->lineEdit_ani_aniso, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_aniso_ani()));
-	connect(this->lineEdit_anix_aniso, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_aniso_ani()));
-	connect(this->lineEdit_aniy_aniso, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_aniso_ani()));
-	connect(this->lineEdit_aniz_aniso, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_aniso_ani()));
-	// Spin polarised current
-	connect(this->checkBox_stt_aniso, SIGNAL(stateChanged(int)), this, SLOT(set_hamiltonian_aniso_stt()));
-	connect(this->lineEdit_stt_aniso, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_aniso_stt()));
-	connect(this->lineEdit_sttx_aniso, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_aniso_stt()));
-	connect(this->lineEdit_stty_aniso, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_aniso_stt()));
-	connect(this->lineEdit_sttz_aniso, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_aniso_stt()));
-	// Temperature
-	connect(this->checkBox_T_aniso, SIGNAL(stateChanged(int)), this, SLOT(set_hamiltonian_aniso_temp()));
-	connect(this->lineEdit_T_aniso, SIGNAL(returnPressed()), this, SLOT(set_hamiltonian_aniso_temp()));
+	connect(this->checkBox_Heisenberg_anisotropy, SIGNAL(stateChanged(int)), this, SLOT(set_heisenberg_anisotropy()));
+	connect(this->doubleSpinBox_Heisenberg_anisotropy_magnitude, SIGNAL(valueChanged(double)), this, SLOT(set_heisenberg_anisotropy()));
+	connect(this->doubleSpinBox_Heisenberg_anisotropy_direction_x, SIGNAL(valueChanged(double)), this, SLOT(set_heisenberg_anisotropy()));
+	connect(this->doubleSpinBox_Heisenberg_anisotropy_direction_y, SIGNAL(valueChanged(double)), this, SLOT(set_heisenberg_anisotropy()));
+	connect(this->doubleSpinBox_Heisenberg_anisotropy_direction_z, SIGNAL(valueChanged(double)), this, SLOT(set_heisenberg_anisotropy()));
 }
 
 void SettingsWidget::Setup_Parameters_Slots()
 {
+	// LLG Spin polarised current
+	connect(this->checkBox_Parameters_STT, SIGNAL(stateChanged(int)), this, SLOT(set_parameters()));
+	connect(this->doubleSpinBox_Parameters_STT, SIGNAL(valueChanged(double)), this, SLOT(set_parameters()));
+	connect(this->doubleSpinBox_Parameters_STT_direction_x, SIGNAL(valueChanged(double)), this, SLOT(set_parameters()));
+	connect(this->doubleSpinBox_Parameters_STT_direction_y, SIGNAL(valueChanged(double)), this, SLOT(set_parameters()));
+	connect(this->doubleSpinBox_Parameters_STT_direction_z, SIGNAL(valueChanged(double)), this, SLOT(set_parameters()));
+	// LLG Temperature
+	connect(this->checkBox_Parameters_temperature, SIGNAL(stateChanged(int)), this, SLOT(set_parameters()));
+	connect(this->doubleSpinBox_Parameters_temperature, SIGNAL(valueChanged(double)), this, SLOT(set_parameters()));
 	// LLG Damping
 	connect(this->lineEdit_Damping, SIGNAL(returnPressed()), this, SLOT(set_parameters()));
 	connect(this->lineEdit_dt, SIGNAL(returnPressed()), this, SLOT(set_parameters()));

@@ -6,6 +6,8 @@
 struct State;
 
 // Set LLG
+DLLEXPORT void Parameters_Set_LLG_Temperature(State *state, float T, int idx_image=-1, int idx_chain=-1);
+DLLEXPORT void Parameters_Set_LLG_STT(State *state, float magnitude, const float * normal, int idx_image=-1, int idx_chain=-1);
 DLLEXPORT void Parameters_Set_LLG_Time_Step(State *state, float dt, int idx_image=-1, int idx_chain=-1);
 DLLEXPORT void Parameters_Set_LLG_Damping(State *state, float damping, int idx_image=-1, int idx_chain=-1);
 DLLEXPORT void Parameters_Set_LLG_N_Iterations(State *state, int n_iterations, int idx_image=-1, int idx_chain=-1);
@@ -18,6 +20,8 @@ DLLEXPORT void Parameters_Set_GNEB_N_Iterations_Log(State *state, int n_iteratio
 
 
 // Get LLG
+DLLEXPORT void Parameters_Get_LLG_Temperature(State *state, float * T, int idx_image=-1, int idx_chain=-1);
+DLLEXPORT void Parameters_Get_LLG_STT(State *state, float * magnitude, float * normal, int idx_image=-1, int idx_chain=-1);
 DLLEXPORT void Parameters_Get_LLG_Time_Step(State *state, float * dt, int idx_image=-1, int idx_chain=-1);
 DLLEXPORT void Parameters_Get_LLG_Damping(State *state, float * damping, int idx_image=-1, int idx_chain=-1);
 DLLEXPORT int Parameters_Get_LLG_N_Iterations(State *state, int idx_image=-1, int idx_chain=-1);
