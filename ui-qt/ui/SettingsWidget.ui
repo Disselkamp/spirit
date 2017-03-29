@@ -1554,6 +1554,9 @@
              </item>
              <item row="4" column="3">
               <widget class="QDoubleSpinBox" name="doubleSpinBox_Heisenberg_field_direction_y">
+               <property name="locale">
+                <locale language="C" country="AnyCountry"/>
+               </property>
                <property name="minimum">
                 <double>-100.000000000000000</double>
                </property>
@@ -1564,6 +1567,9 @@
              </item>
              <item row="3" column="2">
               <widget class="QDoubleSpinBox" name="doubleSpinBox_Heisenberg_field_magnitude">
+               <property name="locale">
+                <locale language="C" country="AnyCountry"/>
+               </property>
                <property name="minimum">
                 <double>0.000000000000000</double>
                </property>
@@ -1574,6 +1580,9 @@
              </item>
              <item row="4" column="2">
               <widget class="QDoubleSpinBox" name="doubleSpinBox_Heisenberg_field_direction_x">
+               <property name="locale">
+                <locale language="C" country="AnyCountry"/>
+               </property>
                <property name="minimum">
                 <double>-100.000000000000000</double>
                </property>
@@ -1584,6 +1593,9 @@
              </item>
              <item row="4" column="4">
               <widget class="QDoubleSpinBox" name="doubleSpinBox_Heisenberg_field_direction_z">
+               <property name="locale">
+                <locale language="C" country="AnyCountry"/>
+               </property>
                <property name="minimum">
                 <double>-100.000000000000000</double>
                </property>
@@ -1597,6 +1609,9 @@
              </item>
              <item row="5" column="2">
               <widget class="QDoubleSpinBox" name="doubleSpinBox_Heisenberg_mu_s">
+               <property name="locale">
+                <locale language="C" country="AnyCountry"/>
+               </property>
                <property name="decimals">
                 <number>4</number>
                </property>
@@ -1731,6 +1746,9 @@
            </item>
            <item row="23" column="1">
             <widget class="QPlainTextEdit" name="plainTextEdit_Heisenberg_pairs">
+             <property name="locale">
+              <locale language="C" country="AnyCountry"/>
+             </property>
              <property name="plainText">
               <string># Manual pair input</string>
              </property>
@@ -1820,6 +1838,9 @@
              </item>
              <item row="1" column="1">
               <widget class="QDoubleSpinBox" name="doubleSpinBox_Heisenberg_anisotropy_direction_x">
+               <property name="locale">
+                <locale language="C" country="AnyCountry"/>
+               </property>
                <property name="decimals">
                 <number>2</number>
                </property>
@@ -1833,6 +1854,9 @@
              </item>
              <item row="0" column="1">
               <widget class="QDoubleSpinBox" name="doubleSpinBox_Heisenberg_anisotropy_magnitude">
+               <property name="locale">
+                <locale language="C" country="AnyCountry"/>
+               </property>
                <property name="decimals">
                 <number>4</number>
                </property>
@@ -1846,6 +1870,9 @@
              </item>
              <item row="1" column="2">
               <widget class="QDoubleSpinBox" name="doubleSpinBox_Heisenberg_anisotropy_direction_y">
+               <property name="locale">
+                <locale language="C" country="AnyCountry"/>
+               </property>
                <property name="minimum">
                 <double>-100.000000000000000</double>
                </property>
@@ -1856,6 +1883,9 @@
              </item>
              <item row="1" column="3">
               <widget class="QDoubleSpinBox" name="doubleSpinBox_Heisenberg_anisotropy_direction_z">
+               <property name="locale">
+                <locale language="C" country="AnyCountry"/>
+               </property>
                <property name="minimum">
                 <double>-100.000000000000000</double>
                </property>
@@ -1921,6 +1951,9 @@
             <layout class="QGridLayout" name="gridLayout_100">
              <item row="0" column="1">
               <widget class="QDoubleSpinBox" name="doubleSpinBox_Heisenberg_dd_radius">
+               <property name="locale">
+                <locale language="C" country="AnyCountry"/>
+               </property>
                <property name="decimals">
                 <number>1</number>
                </property>
@@ -1994,6 +2027,9 @@
              </item>
              <item row="0" column="1">
               <widget class="QDoubleSpinBox" name="doubleSpinBox_Heisenberg_delta">
+               <property name="locale">
+                <locale language="C" country="AnyCountry"/>
+               </property>
                <property name="decimals">
                 <number>4</number>
                </property>
@@ -2064,16 +2100,6 @@
                </property>
               </widget>
              </item>
-             <item row="0" column="1">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
-               <property name="decimals">
-                <number>0</number>
-               </property>
-               <property name="minimum">
-                <double>1.000000000000000</double>
-               </property>
-              </widget>
-             </item>
              <item row="0" column="2">
               <spacer name="horizontalSpacer_54">
                <property name="orientation">
@@ -2086,6 +2112,16 @@
                 </size>
                </property>
               </spacer>
+             </item>
+             <item row="0" column="1">
+              <widget class="QSpinBox" name="spinBox_Heisenberg_n_shells">
+               <property name="locale">
+                <locale language="C" country="AnyCountry"/>
+               </property>
+               <property name="maximum">
+                <number>99</number>
+               </property>
+              </widget>
              </item>
             </layout>
            </item>
@@ -3534,6 +3570,9 @@
                <layout class="QGridLayout" name="gridLayout_103">
                 <item row="0" column="1">
                  <widget class="QDoubleSpinBox" name="doubleSpinBox_Parameters_temperature">
+                  <property name="locale">
+                   <locale language="C" country="AnyCountry"/>
+                  </property>
                   <property name="maximum">
                    <double>9999.000000000000000</double>
                   </property>
@@ -3541,6 +3580,9 @@
                 </item>
                 <item row="2" column="3">
                  <widget class="QDoubleSpinBox" name="doubleSpinBox_Parameters_STT_direction_z">
+                  <property name="locale">
+                   <locale language="C" country="AnyCountry"/>
+                  </property>
                   <property name="minimum">
                    <double>-100.000000000000000</double>
                   </property>
@@ -3551,6 +3593,9 @@
                 </item>
                 <item row="2" column="1">
                  <widget class="QDoubleSpinBox" name="doubleSpinBox_Parameters_STT_direction_x">
+                  <property name="locale">
+                   <locale language="C" country="AnyCountry"/>
+                  </property>
                   <property name="minimum">
                    <double>-100.000000000000000</double>
                   </property>
@@ -3564,6 +3609,9 @@
                 </item>
                 <item row="2" column="2">
                  <widget class="QDoubleSpinBox" name="doubleSpinBox_Parameters_STT_direction_y">
+                  <property name="locale">
+                   <locale language="C" country="AnyCountry"/>
+                  </property>
                   <property name="minimum">
                    <double>-100.000000000000000</double>
                   </property>
@@ -3574,6 +3622,9 @@
                 </item>
                 <item row="1" column="1">
                  <widget class="QDoubleSpinBox" name="doubleSpinBox_Parameters_STT">
+                  <property name="locale">
+                   <locale language="C" country="AnyCountry"/>
+                  </property>
                   <property name="maximum">
                    <double>9999.000000000000000</double>
                   </property>
@@ -3755,6 +3806,9 @@
                     <width>50</width>
                     <height>16777215</height>
                    </size>
+                  </property>
+                  <property name="locale">
+                   <locale language="C" country="AnyCountry"/>
                   </property>
                   <property name="text">
                    <string>1.0</string>
@@ -5617,7 +5671,7 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_2"/>
  </buttongroups>
 </ui>

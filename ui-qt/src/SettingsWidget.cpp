@@ -1556,32 +1556,32 @@ void SettingsWidget::Setup_Hamiltonian_Heisenberg_Slots()
 	connect(this->checkBox_Heisenberg_periodical_b, SIGNAL(stateChanged(int)), this, SLOT(set_heisenberg_bc()));
 	connect(this->checkBox_Heisenberg_periodical_c, SIGNAL(stateChanged(int)), this, SLOT(set_heisenberg_bc()));
 	// mu_s
-	connect(this->doubleSpinBox_Heisenberg_mu_s, SIGNAL(valueChanged(double)), this, SLOT(set_heisenberg_mu_s()));
+	connect(this->doubleSpinBox_Heisenberg_mu_s, SIGNAL(editingFinished()), this, SLOT(set_heisenberg_mu_s()));
 	// External Field
 	connect(this->checkBox_Heisenberg_field, SIGNAL(stateChanged(int)), this, SLOT(set_heisenberg_field()));
-	connect(this->doubleSpinBox_Heisenberg_field_magnitude, SIGNAL(valueChanged(double)), this, SLOT(set_heisenberg_field()));
-	connect(this->doubleSpinBox_Heisenberg_field_direction_x, SIGNAL(valueChanged(double)), this, SLOT(set_heisenberg_field()));
-	connect(this->doubleSpinBox_Heisenberg_field_direction_y, SIGNAL(valueChanged(double)), this, SLOT(set_heisenberg_field()));
-	connect(this->doubleSpinBox_Heisenberg_field_direction_z, SIGNAL(valueChanged(double)), this, SLOT(set_heisenberg_field()));
+	connect(this->doubleSpinBox_Heisenberg_field_magnitude, SIGNAL(editingFinished()), this, SLOT(set_heisenberg_field()));
+	connect(this->doubleSpinBox_Heisenberg_field_direction_x, SIGNAL(editingFinished()), this, SLOT(set_heisenberg_field()));
+	connect(this->doubleSpinBox_Heisenberg_field_direction_y, SIGNAL(editingFinished()), this, SLOT(set_heisenberg_field()));
+	connect(this->doubleSpinBox_Heisenberg_field_direction_z, SIGNAL(editingFinished()), this, SLOT(set_heisenberg_field()));
 	// Anisotropy
 	connect(this->checkBox_Heisenberg_anisotropy, SIGNAL(stateChanged(int)), this, SLOT(set_heisenberg_anisotropy()));
-	connect(this->doubleSpinBox_Heisenberg_anisotropy_magnitude, SIGNAL(valueChanged(double)), this, SLOT(set_heisenberg_anisotropy()));
-	connect(this->doubleSpinBox_Heisenberg_anisotropy_direction_x, SIGNAL(valueChanged(double)), this, SLOT(set_heisenberg_anisotropy()));
-	connect(this->doubleSpinBox_Heisenberg_anisotropy_direction_y, SIGNAL(valueChanged(double)), this, SLOT(set_heisenberg_anisotropy()));
-	connect(this->doubleSpinBox_Heisenberg_anisotropy_direction_z, SIGNAL(valueChanged(double)), this, SLOT(set_heisenberg_anisotropy()));
+	connect(this->doubleSpinBox_Heisenberg_anisotropy_magnitude, SIGNAL(editingFinished()), this, SLOT(set_heisenberg_anisotropy()));
+	connect(this->doubleSpinBox_Heisenberg_anisotropy_direction_x, SIGNAL(editingFinished()), this, SLOT(set_heisenberg_anisotropy()));
+	connect(this->doubleSpinBox_Heisenberg_anisotropy_direction_y, SIGNAL(editingFinished()), this, SLOT(set_heisenberg_anisotropy()));
+	connect(this->doubleSpinBox_Heisenberg_anisotropy_direction_z, SIGNAL(editingFinished()), this, SLOT(set_heisenberg_anisotropy()));
 }
 
 void SettingsWidget::Setup_Parameters_Slots()
 {
 	// LLG Spin polarised current
 	connect(this->checkBox_Parameters_STT, SIGNAL(stateChanged(int)), this, SLOT(set_parameters()));
-	connect(this->doubleSpinBox_Parameters_STT, SIGNAL(valueChanged(double)), this, SLOT(set_parameters()));
-	connect(this->doubleSpinBox_Parameters_STT_direction_x, SIGNAL(valueChanged(double)), this, SLOT(set_parameters()));
-	connect(this->doubleSpinBox_Parameters_STT_direction_y, SIGNAL(valueChanged(double)), this, SLOT(set_parameters()));
-	connect(this->doubleSpinBox_Parameters_STT_direction_z, SIGNAL(valueChanged(double)), this, SLOT(set_parameters()));
+	connect(this->doubleSpinBox_Parameters_STT, SIGNAL(editingFinished()), this, SLOT(set_parameters()));
+	connect(this->doubleSpinBox_Parameters_STT_direction_x, SIGNAL(editingFinished()), this, SLOT(set_parameters()));
+	connect(this->doubleSpinBox_Parameters_STT_direction_y, SIGNAL(editingFinished()), this, SLOT(set_parameters()));
+	connect(this->doubleSpinBox_Parameters_STT_direction_z, SIGNAL(editingFinished()), this, SLOT(set_parameters()));
 	// LLG Temperature
 	connect(this->checkBox_Parameters_temperature, SIGNAL(stateChanged(int)), this, SLOT(set_parameters()));
-	connect(this->doubleSpinBox_Parameters_temperature, SIGNAL(valueChanged(double)), this, SLOT(set_parameters()));
+	connect(this->doubleSpinBox_Parameters_temperature, SIGNAL(editingFinished()), this, SLOT(set_parameters()));
 	// LLG Damping
 	connect(this->lineEdit_Damping, SIGNAL(returnPressed()), this, SLOT(set_parameters()));
 	connect(this->lineEdit_dt, SIGNAL(returnPressed()), this, SLOT(set_parameters()));
