@@ -84,9 +84,9 @@ namespace Engine
 
 			auto shell_radius = Get_Shell_Radius(geometry, nShells);
 			
-			Vector3 a = geometry.basis[0];
-			Vector3 b = geometry.basis[1];
-			Vector3 c = geometry.basis[2];
+			Vector3 a = geometry.translation_vectors[0];
+			Vector3 b = geometry.translation_vectors[1];
+			Vector3 c = geometry.translation_vectors[2];
 
 			// The nShells + 10 is a value that is big enough by experience to 
 			// produce enough needed shells, but is small enough to run sufficiently fast
@@ -133,16 +133,16 @@ namespace Engine
 
 		Vector3 DMI_Normal_from_Pair(const Data::Geometry & geometry, Pair pair, int chirality)
 		{
-			int N = geometry.n_spins_basic_domain[0];
-			int Na = geometry.n_cells[0];
-			int Nb = geometry.n_cells[1];
-			int Nc = geometry.n_cells[2];
+			Vector3 ta = geometry.translation_vectors[0];
+			Vector3 tb = geometry.translation_vectors[1];
+			Vector3 tc = geometry.translation_vectors[2];
 
-			int ispin = 0;
-			int jspin = pair.translations[0]*N + pair.translations[1]*N*Na + pair.translations[2]*N*Na*Nb;
+			int da = pair.translations[0];
+			int db = pair.translations[1];
+			int dc = pair.translations[2];
 
-			auto ipos = geometry.spin_pos[ispin];
-			auto jpos = geometry.spin_pos[jspin];
+			auto ipos = geometry.basis_atoms[pair.i];
+			auto jpos = geometry.basis_atoms[pair.j] + da*ta + db*tb + dc*tc;
 
 			if (chirality == 1)
 			{
@@ -173,9 +173,9 @@ namespace Engine
 
 			if (radius > 1e-6)
 			{
-				Vector3 a = geometry.basis[0];
-				Vector3 b = geometry.basis[1];
-				Vector3 c = geometry.basis[2];
+				Vector3 a = geometry.translation_vectors[0];
+				Vector3 b = geometry.translation_vectors[1];
+				Vector3 c = geometry.translation_vectors[2];
 
 				Vector3 ratio{radius/diagonal[0], radius/diagonal[1], radius/diagonal[2]};
 

@@ -749,9 +749,13 @@ namespace Utility
 							// DMI
 							if (shell_index[ipair] < n_dmi_shells)
 							{
-								DMI_pairs.push_back(neighbour_pairs[ipair]);
-								DMI_magnitude.push_back(dmi_parameter[shell_index[ipair]]);
-								DMI_normal.push_back(Engine::Neighbours::DMI_Normal_from_Pair(*geometry, neighbour_pairs[ipair]));
+								auto dm_normal = Engine::Neighbours::DMI_Normal_from_Pair(*geometry, neighbour_pairs[ipair]);
+								if (dm_normal.norm() > 1e-6)
+								{
+									DMI_normal.push_back(dm_normal);
+									DMI_pairs.push_back(neighbour_pairs[ipair]);
+									DMI_magnitude.push_back(dmi_parameter[shell_index[ipair]]);
+								}
 							}
 						}
 					}
