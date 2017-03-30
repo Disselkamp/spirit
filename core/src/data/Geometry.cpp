@@ -21,6 +21,7 @@ namespace Data
 		// Calculate Bounds of the System
 		this->bounds_max.setZero();
 		this->bounds_min.setZero();
+		// ToDo: use only extremally translated spins: (0,0,0) (Na,0,0) (0,Nb,0) ...
 		for (int iatom = 0; iatom < nos; ++iatom)
 		{
 			for (int dim = 0; dim < 3; ++dim)

@@ -694,10 +694,66 @@ namespace Utility
 					if (myfile.Find("interaction_pairs_file")) myfile.iss >> interaction_pairs_file;
 					if (interaction_pairs_file.length() > 0)
 					{
+						Log(Log_Level::Parameter, Log_Sender::IO, "Hamiltonian_Heisenberg: using manual input of pairs");
 						// The file name should be valid so we try to read it
 						Pairs_from_File(interaction_pairs_file, geometry, n_pairs,
 							Exchange_pairs, Exchange_magnitude,
 							DMI_pairs, DMI_magnitude, DMI_normal);
+					}
+					else
+					{
+						Log(Log_Level::Parameter, Log_Sender::IO, "Hamiltonian_Heisenberg: using shell-wise pair interactions");
+						// Local vars
+						std::vector<int> shell_index(0);
+						pairfield neighbour_pairs(0);
+						int n_exchange_shells=0, n_dmi_shells=0;
+						scalar dmi_chirality=1;
+						// Number of shells
+						myfile.Read_Single(n_exchange_shells, "n_exchange_shells");
+						myfile.Read_Single(n_dmi_shells, "n_dmi_shells");
+						std::vector<scalar> exchange_parameter(n_exchange_shells), dmi_parameter(n_dmi_shells);
+						// Interaction Parameters per shell
+						//    Exchange
+						if (myfile.Find("exchange_constant"))
+						{
+							for (int ishell = 0; ishell < n_exchange_shells; ++ishell)
+							{
+								myfile.iss >> exchange_parameter[ishell];
+							}
+						}
+						else Log(Log_Level::Error, Log_Sender::IO, "Keyword 'exchange_constant' not found!");
+						//    DMI
+						if (myfile.Find("dmi_constant"))
+						{
+							for (int ishell = 0; ishell < n_dmi_shells; ++ishell)
+							{
+								myfile.iss >> dmi_parameter[ishell];
+							}
+						}
+						else Log(Log_Level::Error, Log_Sender::IO, "Keyword 'dmi_constant' not found!");
+						myfile.Read_Single(dmi_chirality, "dmi_chirality");
+						// Neighbour pairs from maximum number of shells
+						int n_shells = std::max(n_exchange_shells, n_dmi_shells);
+						Engine::Neighbours::Pairs_from_Neighbour_Shells(*geometry, n_shells, shell_index, neighbour_pairs);
+						// Actual pairs
+						for (unsigned int ipair=0; ipair < neighbour_pairs.size(); ++ipair)
+						{
+							// Exchange
+							if (shell_index[ipair] < n_exchange_shells)
+							{
+								Exchange_pairs.push_back(neighbour_pairs[ipair]);
+								Exchange_magnitude.push_back(exchange_parameter[shell_index[ipair]]);
+							}
+						// std::cerr << " dmi shells " << n_dmi_shells << "  ipair " << ipair << "   shell_idx " << shell_index[ipair] << std::endl;
+						// std::cerr << " pair " << n_dmi_shells << "  ipair " << ipair << "   shell_idx " << shell_index[ipair] << std::endl;
+							// DMI
+							if (shell_index[ipair] < n_dmi_shells)
+							{
+								DMI_pairs.push_back(neighbour_pairs[ipair]);
+								DMI_magnitude.push_back(dmi_parameter[shell_index[ipair]]);
+								DMI_normal.push_back(Engine::Neighbours::DMI_Normal_from_Pair(*geometry, neighbour_pairs[ipair]));
+							}
+						}
 					}
 					//else
 					//{
