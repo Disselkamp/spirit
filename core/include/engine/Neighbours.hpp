@@ -13,6 +13,16 @@ namespace Engine
 {
 	namespace Neighbours
 	{
+		std::vector<scalar> Get_Shell_Radius(const Data::Geometry & geometry, const int n_shells);
+		void Pairs_from_Neighbour_Shells(const Data::Geometry & geometry, int nShells, std::vector<int> & shellIndex, pairfield & pairs);
+		void DDI_Pairs_from_Neighbours(const Data::Geometry & geometry, scalar radius, pairfield & pairs);
+
+		// void Triplets_from_Neighbours(const Data::Geometry & geometry, tripletfield & triplets);
+		// void Quadruplets_from_Neighbours(const Data::Geometry & geometry, tripletfield & quadruplets);
+		// void FSC_Quadruplets_from_Neighbours(const Data::Geometry & geometry, tripletfield & quadruplets);
+
+
+
 		// creates Neighbours
 		void Create_Neighbours(const Data::Geometry & geometry, const std::vector<bool> & boundary_conditions,
 			const int n_shells, std::vector<std::vector<int>> &n_spins_in_shell,
@@ -22,7 +32,7 @@ namespace Engine
 			std::vector<std::vector<int>> &segments, std::vector<std::vector<Vector3>> &segments_pos);
 
 		// calculates shell radii for every shell
-		std::vector<scalar> Get_Shell_Radius(const Data::Geometry & geometry, const int n_shells);
+		// std::vector<scalar> Get_Shell_Radius(const Data::Geometry & geometry, const int n_shells);
 
 		// calculates array with maximal (for periodic bc) no of neighbours in each shell
 		std::vector<int> Get_MaxNumber_NInShell(const Data::Geometry & geometry, const int n_shells, const std::vector<scalar> & shell_radius,
