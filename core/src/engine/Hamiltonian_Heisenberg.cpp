@@ -18,7 +18,7 @@ using namespace Utility;
 
 namespace Engine
 {
-	inline bool boundary_conditions_fulfilled(const intfield & n_cells, const boolfield & boundary_conditions, const std::array<int,3> & translations_i, const std::array<int,3> & translations_j)
+	inline bool boundary_conditions_fulfilled(const intfield & n_cells, const intfield & boundary_conditions, const std::array<int,3> & translations_i, const std::array<int,3> & translations_j)
 	{
 		int da = translations_i[0]+translations_j[0];
 		int db = translations_i[1]+translations_j[1];
@@ -73,7 +73,7 @@ namespace Engine
 			pairfield DD_pairs, scalarfield DD_magnitude, vectorfield DD_normal,
 			quadrupletfield quadruplets, scalarfield quadruplet_magnitude,
 			std::shared_ptr<Data::Geometry> geometry,
-			std::vector<bool> boundary_conditions
+			intfield boundary_conditions
 	) :
 		Hamiltonian(boundary_conditions),
 		geometry(geometry),

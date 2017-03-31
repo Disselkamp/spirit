@@ -191,7 +191,7 @@ namespace Utility
 			// Translation vectors [dim][nov]
 			std::vector<Vector3> translation_vectors = { Vector3{1,0,0}, Vector3{0,1,0}, Vector3{0,0,1} };
 			// Number of translations nT for each basis direction
-			std::vector<int> n_cells = { 100, 100, 1 };
+			intfield n_cells = { 100, 100, 1 };
 			// Number of Spins
 			int nos;
 			vectorfield spin_pos;
@@ -552,7 +552,7 @@ namespace Utility
 			//-------------- Insert default values here -----------------------------
 			// Boundary conditions (a, b, c)
 			std::vector<int> boundary_conditions_i = { 0, 0, 0 };
-			std::vector<bool> boundary_conditions = { false, false, false };
+			intfield boundary_conditions = { false, false, false };
 			// Spin moment
 			scalarfield mu_s = scalarfield(geometry->nos, 2);	// [nos]
 			// External Magnetic Field

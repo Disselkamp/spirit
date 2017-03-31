@@ -29,7 +29,7 @@ namespace Engine
 			pairfield DD_pairs, scalarfield DD_magnitude, vectorfield DD_normal,
 			quadrupletfield quadruplets, scalarfield quadruplet_magnitude,
 			std::shared_ptr<Data::Geometry> geometry,
-			std::vector<bool> boundary_conditions
+			intfield boundary_conditions
 		);
 
 		void Update_Energy_Contributions() override;
