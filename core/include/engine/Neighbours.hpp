@@ -28,6 +28,9 @@ namespace Engine
 		std::vector<int> Get_MaxNumber_NInShell(const Data::Geometry & geometry, const int n_shells, const std::vector<scalar> & shell_radius,
 			std::vector<Vector3> boundary_vectors, const bool borderOnly);
 
+		// calculates the nearest neighbours of each basis atom 
+		void get_Neighbours(const Data::Geometry & geometry, Neighbourfield & neigh);
+
 		// calculates the neighbours within all the shells
 		void Get_Neighbours_in_Shells(const Data::Geometry & geometry, const int n_shells, const std::vector<scalar> & shell_radius,
 			const std::vector<Vector3> &boundary_vectors, std::vector<std::vector<int>> &n_spins_in_shell,

@@ -144,7 +144,7 @@ namespace Engine
 		int ii, jj, kk;
 		//the 10 is a value that is big enough by experience to 
 		// produce enough needed shells, but is small enough to run sufficiently quick
-		int imax = 10, jmax = 10, kmax = 10;
+		int imax = 30, jmax = 30, kmax = 30;
 		Vector3 build_array = { 0, 0, 0 };
 
 		//abort condidions for all 3 vectors
@@ -276,6 +276,60 @@ namespace Engine
 		// Return
 		return max_number_n_in_shell;
 	}//end Neighbours::Get_MaxNumber_NInShell
+
+	void Neighbours::get_Neighbours(const Data::Geometry & geometry, Neighbourfield & neigh)
+	{
+		// shellIndex = std::vector<int>(0);
+		// pairs = pairfield(0);
+		neigh = Neighbourfield(0);
+		
+		auto shell_radius = Get_Shell_Radius(geometry, 1);
+
+		Vector3 a = geometry.translation_vectors[0];
+		Vector3 b = geometry.translation_vectors[1];
+		Vector3 c = geometry.translation_vectors[2];
+
+		int tMax = 1 + 10;
+		int imax = tMax, jmax = tMax, kmax = tMax;
+		int i,j,k;
+		scalar dx, delta, radius;
+		Vector3 x0={0,0,0}, x1={0,0,0};
+
+		// Abort condidions for all 3 vectors
+		if (a.norm() == 0.0) imax = 0;
+		if (b.norm() == 0.0) jmax = 0;
+		if (c.norm() == 0.0) kmax = 0;
+
+		for (int iatom = 0; iatom < geometry.n_spins_basic_domain; ++iatom)
+		{
+			x0 = geometry.basis_atoms[iatom];
+			neigh.push_back(std::vector< Neighbour > (0));
+			for (int ishell = 0; ishell < 1; ++ishell)
+			{
+				radius = shell_radius[ishell];
+				for (i = imax; i >= -imax; --i)
+				{
+					for (j = jmax; j >= -jmax; --j)
+					{
+						for (k = kmax; k >= -kmax; --k)
+						{
+							for (int jatom = 0; jatom < geometry.n_spins_basic_domain; ++jatom)
+							{
+								x1 = geometry.basis_atoms[jatom] + i*a + j*b + k*c;
+								dx = (x0-x1).norm();
+								delta = std::abs(dx - radius);
+								if (delta < 1e-6)
+								{
+									//shellIndex.push_back(ishell);
+									neigh[iatom].push_back( { jatom, {i, j, k} } );
+								}
+							}//endfor jatom
+						}//endfor k
+					}//endfor j
+				}//endfor i
+			}//endfor ishell
+		}//endfor iatom
+	}//end Neighbours::get_Neighbours
 
 
 	void Neighbours::Get_Neighbours_in_Shells(const Data::Geometry & geometry, const int n_shells, const std::vector<scalar> & shell_radius,

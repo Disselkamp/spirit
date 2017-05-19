@@ -1,6 +1,8 @@
+#pragma once
 #include <Eigen/Core>
 
 #include <vector>
+#include <tuple>
 
 #include "Spirit_Defines.h"
 
@@ -32,4 +34,11 @@ typedef Eigen::Matrix<int, 4, 1> indexQuadruplet;
     typedef std::vector<Vector3>         vectorfield;
     typedef std::vector<indexPair>       indexPairs;
     typedef std::vector<indexQuadruplet> indexQuadruplets;
+    
+    struct Neighbour
+    {
+        int jatom;
+        Vector3 translations;
+    };
+    typedef std::vector< std::vector< Neighbour > > Neighbourfield;
 #endif

@@ -120,6 +120,11 @@ namespace Engine
 		void set_c_cross(const scalar & c, const Vector3 & a, const vectorfield & b, vectorfield & out);
 		// out[i] = c * a[i] x b[i]
 		void set_c_cross(const scalar & c, const vectorfield & a, const vectorfield & b, vectorfield & out);
+
+		//STT - gradient
+		void gradient(const vectorfield & spins, const Data::Geometry & geometry, const Vector3 & je, vectorfield & out);
+		inline int idx_from_translations(const std::vector<int> & n_cells, int n_spins_basic_domain, const Vector3 & translations_i, const Vector3 & translations);
+		inline Vector3 translations_from_idx(const std::vector<int> & n_cells, int n_spins_basic_domain, int idx);
 	}
 }
 

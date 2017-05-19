@@ -1,5 +1,6 @@
 #ifndef USE_CUDA
 
+#include <engine/Neighbours.hpp>
 #include <engine/Vectormath.hpp>
 #include <engine/Manifoldmath.hpp>
 #include <utility/Logging.hpp>
@@ -27,7 +28,7 @@ namespace Engine
 		}
 
 		/////////////////////////////////////////////////////////////////
-
+		
 
 		void Build_Spins(vectorfield & spin_pos, const std::vector<Vector3> & basis_atoms, const std::vector<Vector3> & translation_vectors, const std::vector<int> & n_cells)
 		{
@@ -42,7 +43,7 @@ namespace Engine
 						for (int k2 = -2; k2 <= 2; ++k2)
 						{
 							for (int k3 = -2; k3 <= 2; ++k3)
-							{
+							{ 
 								// Norm is zero if translated basis atom is at position of another basis atom
 								sp = basis_atoms[i] - (basis_atoms[j]
 									+ k1*translation_vectors[0] + k2*translation_vectors[1] + k3*translation_vectors[2]);
@@ -129,7 +130,7 @@ namespace Engine
 				for (int dim = 0; dim < 3; ++dim)
 				{
 					// PRNG gives RN int [0,1] -> [-1,1] -> multiply with epsilon
-					xi[i][dim] = epsilon*(sys.llg_parameters->distribution_int(sys.llg_parameters->prng) * 2 - 1);
+					xi[i][dim] = epsilon*(sys.llg_parameters->distribution_int(sys.llg_parameters->prng) * 2 - 1); 
 				}
 			}
 		}
@@ -389,6 +390,81 @@ namespace Engine
 			{
 				out[idx] = c*a[idx].cross(b[idx]);
 			}
+		}
+		// SST -- gradient (j_e*grad)*S
+		void gradient(const vectorfield & spins, const Data::Geometry & geometry, const Vector3 & je, vectorfield & out)
+		{
+			vectorfield translations;
+			std::vector <int> n_cells = geometry.n_cells;
+
+			Vector3 a = geometry.translation_vectors[0];
+			Vector3 b = geometry.translation_vectors[1];
+			Vector3 c = geometry.translation_vectors[2];
+
+			Neighbourfield neigh;
+			Neighbours::get_Neighbours(geometry, neigh); // richtig?
+
+			Vector3 diffq0, diffq1, diffq2, diffqx, diffqy, diffqz;
+
+			for(unsigned int i = 0; i < spins.size(); ++i)
+			{
+				Vector3 translations_i = translations_from_idx(n_cells, geometry.n_spins_basic_domain, i);
+				int k = i%geometry.n_spins_basic_domain;
+
+				std::vector<int> idx (neigh[k].size(), 0);
+				for(unsigned int j = 0; j < neigh[k].size(); ++j)
+				{
+					Vector3 translation = geometry.basis_atoms[neigh[k][j].jatom] + neigh[k][j].translations[0]*a + neigh[k][j].translations[1]*b + neigh[k][j].translations[2]*c;
+					idx[j] = idx_from_translations(n_cells, geometry.n_spins_basic_domain, translations_i, translation);
+					translations[j] = translation;
+				}
+
+				diffq0 = (spins[idx[0]]-spins[i])/translations[0].norm();
+				diffq1 = (spins[idx[1]]-spins[i])/translations[1].norm();
+				diffq2 = (spins[idx[2]]-spins[i])/translations[2].norm();
+
+				diffqx = translations[0][0]*diffq0+translations[1][0]*diffq1+translations[2][0]*diffq2;
+				diffqy = translations[0][1]*diffq0+translations[1][1]*diffq1+translations[2][1]*diffq2;
+				diffqz = translations[0][2]*diffq0+translations[1][2]*diffq1+translations[2][2]*diffq2;
+
+				out[i] = je[0]*diffqx+je[1]*diffqy+je[2]*diffqz;
+			}
+		}
+
+		// index from translationvector and vise versa
+		inline int idx_from_translations(const std::vector<int> & n_cells, int n_spins_basic_domain, const Vector3 & translations_i, const Vector3 & translations)
+		{
+			int Na = n_cells[0];
+			int Nb = n_cells[1];
+			int Nc = n_cells[2];
+			int N  = n_spins_basic_domain;
+
+			int da = translations_i[0]+translations[0];
+			int db = translations_i[1]+translations[1];
+			int dc = translations_i[2]+translations[2];
+
+			if (translations[0] < 0)
+				da += N*Na;
+			if (translations[1] < 0)
+				db += N*Na*Nb;
+			if (translations[2] < 0)
+				dc += N*Na*Nb*Nc;
+				
+			int idx = (da%Na)*N + (db%Nb)*N*Na + (dc%Nc)*N*Na*Nb;
+			
+			return idx;
+		}
+		inline Vector3 translations_from_idx(const std::vector<int> & n_cells, int n_spins_basic_domain, int idx)
+		{
+			Vector3 ret;
+			int Na = n_cells[0];
+			int Nb = n_cells[1];
+			int Nc = n_cells[2];
+			int N  = n_spins_basic_domain;
+			ret[2] = idx/(Na*Nb);
+			ret[1] = (idx-ret[2]*Na*Nb)/Na;
+			ret[0] = idx-ret[2]*Na*Nb-ret[1]*Na;
+			return ret;
 		}
 	}
 }

@@ -62,7 +62,12 @@ namespace Engine
 		scalar sqrtdt = std::sqrt(llg_params.dt), dtg = llg_params.dt, sqrtdtg = sqrtdt;
 		// STT
 		scalar a_j = llg_params.stt_magnitude;
-		Vector3 s_c_vec = llg_params.stt_polarisation_normal;
+		Vector3 s_c_vec = llg_params.stt_polarisation_normal; 
+		//STT gradient
+		bool gradON = true;
+		scalar b_j = 1;
+		Vector3 je = { 0,0,1 };
+		vectorfield s_c_grad;
 		//------------------------ End Init ----------------------------------------
 
 		Vectormath::fill       (force, {0,0,0});
@@ -70,11 +75,20 @@ namespace Engine
 		Vectormath::add_c_cross(-0.5 * dtg * damping, spins, gradient, force);
 
 		// STT
-		if (a_j > 0)
+		if (a_j > 0 && gradON == false)
 		{
 			Vectormath::add_c_a    ( 0.5 * dtg * a_j * damping, s_c_vec, force);
 			Vectormath::add_c_cross( 0.5 * dtg * a_j, s_c_vec, spins, force);
 		}
+
+		// STT gradient
+		auto & geometry = *this->method->systems[0]->geometry;
+		if(a_j > 0 && gradON == true)
+		{
+			Vectormath::gradient   (spins, geometry, je, s_c_grad); // s_c_grad = (j_e*grad)*S
+			Vectormath::add_c_a    ( 0.5 * dtg * b_j * damping, s_c_grad, force);
+			Vectormath::add_c_cross( 0.5 * dtg * b_j, spins, s_c_grad, force);
+		}		
 
 		// Temperature
 		if (llg_params.temperature > 0)
