@@ -279,6 +279,7 @@ namespace Engine
 
 	void Neighbours::get_Neighbours(const Data::Geometry & geometry, Neighbourfield & neigh)
 	{
+		std::cout << "start get_Neighbours" << std::endl;
 		// shellIndex = std::vector<int>(0);
 		// pairs = pairfield(0);
 		neigh = Neighbourfield(0);
@@ -289,8 +290,15 @@ namespace Engine
 		Vector3 b = geometry.translation_vectors[1];
 		Vector3 c = geometry.translation_vectors[2];
 
-		int tMax = 1 + 10;
+		int Na = geometry.n_cells[0];
+		int Nb = geometry.n_cells[1];
+		int Nc = geometry.n_cells[2];
+
+		int tMax = 10; //
 		int imax = tMax, jmax = tMax, kmax = tMax;
+		if (imax > Na-1) imax = Na-1; // besser min
+		if (jmax > Nb-1) jmax = Nb-1;
+		if (kmax > Nc-1) kmax = Nc-1;
 		int i,j,k;
 		scalar dx, delta, radius;
 		Vector3 x0={0,0,0}, x1={0,0,0};
@@ -329,6 +337,7 @@ namespace Engine
 				}//endfor i
 			}//endfor ishell
 		}//endfor iatom
+		std::cout << "end get_Neighbours" << std::endl;
 	}//end Neighbours::get_Neighbours
 
 
