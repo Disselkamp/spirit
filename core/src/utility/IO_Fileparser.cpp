@@ -304,12 +304,14 @@ namespace Utility
 					}
 
 					// TODO: propagation of basis anisotropy across lattice
-
-					if (spin_K != 0)
+					for (int ispin=0; ispin < geometry.nos; ++ispin)
 					{
-						anisotropy_index.push_back(spin_i);
-						anisotropy_magnitude.push_back(spin_K);
-						anisotropy_normal.push_back(Vector3{spin_K1, spin_K2, spin_K3});
+						if (spin_K != 0)
+						{
+							anisotropy_index.push_back(ispin);
+							anisotropy_magnitude.push_back(spin_K);
+							anisotropy_normal.push_back(Vector3{spin_K1, spin_K2, spin_K3});
+						}
 					}
 
 				}// end while getline
