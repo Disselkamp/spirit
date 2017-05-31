@@ -20,6 +20,14 @@ namespace Engine
     {
 		std::shared_ptr<Data::Spin_System> s;
 
+		//fix first and last spin of 1D chain
+		for (int i=0; i < this->noi; ++i)
+		{
+			s = method->systems[i];
+			(*s->spins)[0] = { 1.0,0.0,0.0 };
+			(*s->spins)[(*s->spins).size()-1.0] = { -1.0,0.0,0.0 };
+		}
+
 		// Random Numbers
 		for (int i = 0; i < this->noi; ++i)
 		{
@@ -56,6 +64,16 @@ namespace Engine
 
 	void Optimizer_SIB::VirtualForce(vectorfield & spins, Data::Parameters_Method_LLG & llg_params, vectorfield & gradient,  vectorfield & xi, vectorfield & force)
 	{
+		// test
+		// Vector3 vec1 = { 1,0,0 };
+		// Vector3 vec2 = { 0,1,0 };
+		// std::cout << "spins:" << std::endl;
+		// for(int i = 0; i < spins.size(); ++i){
+		// 	double N = spins.size();
+		// 	spins[i] = vec1*std::sin(2.0*3.1415*i/N) + vec2*std::cos(2.0*3.1415*i/N); //
+		// 	std::cout << "(" << std::sin(2.0*3.1415*i/N) << ", " <<  std::cos(2.0*3.1415*i/N) << ")" << ",";
+		// }
+
 		//========================= Init local vars ================================
 		// time steps
 		scalar damping = llg_params.damping;
@@ -65,8 +83,8 @@ namespace Engine
 		Vector3 s_c_vec = llg_params.stt_polarisation_normal; 
 		//STT gradient
 		bool gradON = true;
-		scalar b_j = 1;
-		Vector3 je = { 0,0,1 };
+		scalar b_j = 1.0;
+		Vector3 je = { 1,0,0 };
 		vectorfield s_c_grad;
 		//------------------------ End Init ----------------------------------------
 
@@ -77,18 +95,25 @@ namespace Engine
 		// STT
 		if (a_j > 0 && gradON == false)
 		{
-			Vectormath::add_c_a    ( 0.5 * dtg * a_j * damping, s_c_vec, force);
-			Vectormath::add_c_cross( 0.5 * dtg * a_j, s_c_vec, spins, force);
+			Vectormath::add_c_a    ( -0.5 * dtg * a_j * damping, s_c_vec, force); // Vorzeichen!
+			Vectormath::add_c_cross( -0.5 * dtg * a_j, s_c_vec, spins, force);
 		}
 
 		// STT gradient
 		auto & geometry = *this->method->systems[0]->geometry;
-		if(a_j > 0 && gradON == true)
+		auto & hamiltonian = *this->method->systems[0]->hamiltonian;
+		if (a_j > 0 && gradON == true)
 		{
-			Vectormath::gradient   (spins, geometry, je, s_c_grad); // s_c_grad = (j_e*grad)*S
-			Vectormath::add_c_a    ( 0.5 * dtg * b_j * damping, s_c_grad, force);
-			Vectormath::add_c_cross( 0.5 * dtg * b_j, spins, s_c_grad, force);
-		}		
+			Vectormath::gradient   (spins, hamiltonian, geometry, je, s_c_grad); // s_c_grad = (j_e*grad)*S
+			Vectormath::add_c_a    ( -0.5 * dtg * a_j * damping, s_c_grad, force); //a_j durch b_j ersetzen 
+			Vectormath::add_c_cross( -0.5 * dtg * a_j, s_c_grad, spins, force); //a_j durch b_j ersetzen 
+		}
+		//test
+		// std::cout << "s_c_grad:" << std::endl;
+		// for (int i = 0; i < spins.size(); ++i){
+		// std::cout << "(" << s_c_grad[i][0] << ", " << s_c_grad[i][1] /* << ", " << s_c_grad[i][2]*/ << ")" << ",";
+		// }
+		// std::cout << "=====================" << std::endl;
 
 		// Temperature
 		if (llg_params.temperature > 0)

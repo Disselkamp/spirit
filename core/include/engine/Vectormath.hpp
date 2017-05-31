@@ -122,9 +122,10 @@ namespace Engine
 		void set_c_cross(const scalar & c, const vectorfield & a, const vectorfield & b, vectorfield & out);
 
 		//STT - gradient
-		void gradient(const vectorfield & spins, const Data::Geometry & geometry, const Vector3 & je, vectorfield & out);
-		inline int idx_from_translations(const std::vector<int> & n_cells, int n_spins_basic_domain, const Vector3 & translations_i, const Vector3 & translations);
-		inline Vector3 translations_from_idx(const std::vector<int> & n_cells, int n_spins_basic_domain, int idx);
+		void gradient(const vectorfield & spins, const Engine::Hamiltonian & hamiltonian, const Data::Geometry & geometry, const Vector3 & je, vectorfield & s_c_grad);
+		inline int idx_from_translations(const intfield & n_cells, const int & n_spins_basic_domain, const std::array<int,3> & translations_i, const std::array<int,3> & translations);
+		inline std::array<int,3> translations_from_idx(const intfield & n_cells, const int & n_spins_basic_domain, int idx);
+		inline bool boundary_conditions_fulfilled(const intfield & n_cells, const std::vector<bool> & boundary_conditions, const std::array<int, 3> & translations_i, const std::array<int, 3> & translations_j);
 	}
 }
 
