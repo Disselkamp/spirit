@@ -279,7 +279,6 @@ namespace Engine
 
 	void Neighbours::get_Neighbours(const Data::Geometry & geometry, Neighbourfield & neigh)
 	{
-		std::cout << "start get_Neighbours" << std::endl;
 		// shellIndex = std::vector<int>(0);
 		// pairs = pairfield(0);
 		neigh = Neighbourfield(0);
@@ -337,7 +336,6 @@ namespace Engine
 				}//endfor i
 			}//endfor ishell
 		}//endfor iatom
-		std::cout << "end get_Neighbours" << std::endl;
 	}//end Neighbours::get_Neighbours
 
 
