@@ -20,14 +20,6 @@ namespace Engine
     {
 		std::shared_ptr<Data::Spin_System> s;
 
-		//fix first and last spin of 1D chain
-		for (int i=0; i < this->noi; ++i)
-		{
-			s = method->systems[i];
-			(*s->spins)[0] = { 1.0,0.0,0.0 };
-			(*s->spins)[(*s->spins).size()-1.0] = { -1.0,0.0,0.0 };
-		}
-
 		// Random Numbers
 		for (int i = 0; i < this->noi; ++i)
 		{

@@ -92,6 +92,13 @@ namespace Engine
             this->method->Hook_Pre_Iteration();
 			// Do one single Iteration
 			this->Iteration();
+            //fix position of first and last spin of 1D chain
+            for (int i=0; i < this->noi; ++i)
+            {
+                std::shared_ptr<Data::Spin_System> s = this->method->systems[i];
+                (*s->spins)[0] = { 1.0,0.0,0.0 };
+                (*s->spins)[(*s->spins).size()-1.0] = { -1.0,0.0,0.0 };
+            }
             // Post-Iteration hook
             this->method->Hook_Post_Iteration();
 
