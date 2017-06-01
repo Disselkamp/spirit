@@ -404,8 +404,13 @@ namespace Engine
 			Vector3 b = geometry.translation_vectors[1];
 			Vector3 c = geometry.translation_vectors[2];
 
+			// TODO: calculate Neighbours before iterations
 			Neighbourfield neigh;
-			Neighbours::get_Neighbours(geometry, neigh);
+			// Neighbours::get_Neighbours(geometry, neigh);
+			neigh = Neighbourfield(0);
+			neigh.push_back(std::vector< Neighbour > (0));
+			neigh[0].push_back({ 0, {1.0, 0.0, 0.0} }); 
+			neigh[0].push_back({ 0, {-1.0, 0.0, 0.0} });
 			// std::cout << "Neighbours: " << neigh[k][j].jatom << " " << neigh[k][j].translations[0]
 
 			Vector3  diffq, diffqx, diffqy, diffqz;
