@@ -25,7 +25,7 @@ from spirit import io
 from spirit import log
 from spirit import hamiltonian
 
-cfgfile = "input/input.cfg"
+cfgfile = "input/schieback_displacement.cfg"
 
 with state.State(cfgfile) as p_state:
     
