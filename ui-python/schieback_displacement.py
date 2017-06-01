@@ -29,10 +29,10 @@ cfgfile = "input/input.cfg"
 
 with state.State(cfgfile) as p_state:
     
-    filename = "output/spins_schieback_relaxed_VP.txt"
+    filename = "input/spins_schieback_relaxed_VP.txt"
     # WELCHE WERTE FUER STTMAGNITUDE?
     k = 0
-    for stt_magnitude in [0.01, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.01, 0.015, 0.02, 0.025, 0.03, 0.032, 0.034, 0.036, 0.038, 0.04]:
+    for stt_magnitude in [0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.01, 0.015, 0.02, 0.025, 0.03, 0.032, 0.034, 0.036, 0.038, 0.04]:
         
         # head to head domain with domain wall - relaxed with VP
         print "read relaxed System" # verschoben um -1 von Mitte
