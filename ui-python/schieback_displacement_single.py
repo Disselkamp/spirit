@@ -24,7 +24,7 @@ from spirit import io
 from spirit import log
 from spirit import hamiltonian
 
-cfgfile = "input/schieback_displacement_single.cfg"
+cfgfile = "input/input.cfg"
 
 with state.State(cfgfile) as p_state:
 
@@ -36,12 +36,13 @@ with state.State(cfgfile) as p_state:
     configuration.Domain(p_state, [1.0,0.0,0.0], pos=[-129,0,0], border_cylindrical=128)
 
     # domain wall
+    # configuration.Domain(p_state, [-1.0,1.0,0.0], pos=[1,0,0], border_cylindrical=1)
     configuration.Domain(p_state, [-1.0,1.0,0.0], pos=[1,0,0], border_cylindrical=1)
-    configuration.Domain(p_state, [-1.0,1.0,0.0], pos=[0,0,0], border_cylindrical=1)
-    configuration.Domain(p_state, [0.0,1.0,0.0], pos=[-1,0,0], border_cylindrical=1)
-    configuration.Domain(p_state, [1.0,1.0,0.0], pos=[-2,0,0], border_cylindrical=1)
-    configuration.Domain(p_state, [-1.0,1.0,0.0], pos=[-3,0,0], border_cylindrical=1)
+    configuration.Domain(p_state, [0.0,1.0,0.0], pos=[0,0,0], border_cylindrical=1)
+    configuration.Domain(p_state, [1.0,1.0,0.0], pos=[-1,0,0], border_cylindrical=1)
+    # configuration.Domain(p_state, [-1.0,1.0,0.0], pos=[-3,0,0], border_cylindrical=1)
     
+    simulation.PlayPause(p_state, "LLG", "SIB", n_iterations=1)
 
     spins = system.Get_Spin_Directions( p_state, idx_chain=-1 )
     print spins
