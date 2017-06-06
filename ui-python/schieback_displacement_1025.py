@@ -26,14 +26,14 @@ from spirit import io
 from spirit import log
 from spirit import hamiltonian
 
-cfgfile = "input/schieback_displacement.cfg"
+cfgfile = "input/input.cfg"
 
 with state.State(cfgfile) as p_state:
     
-    filename = "input/spins_schieback_relaxed_VP.txt"
+    filename = "input/spins_schieback_relaxed_VP_1025.txt"
     # WELCHE WERTE FUER STTMAGNITUDE?
     k = 0
-    for stt_magnitude in [0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.01, 0.015, 0.02, 0.025, 0.03, 0.032, 0.034, 0.036, 0.038, 0.04]:
+    for stt_magnitude in [0.02, 0.025, 0.03, 0.032, 0.034, 0.036, 0.038, 0.04]:
         
         # head to head domain with domain wall - relaxed with VP
         print "read relaxed System" # verschoben um -1 von Mitte
@@ -53,11 +53,11 @@ with state.State(cfgfile) as p_state:
 
         # measurement = [range(0,1000), range(0,1000), range(0,1000), range(0,1000), range(0,1000), range(0,1000), range(0,600), range(0,600), range(0,600), range(0,600), range(0,400), range(0,400), range(0,400), range(0,400), range(0,400), range(0,400), range(0,400), range(0,400), range(0,400)]
         # for i in measurement[k]:
-        for i in range(0, int(np.log(10000*stt_magnitude)*250)):
+        for i in range(0, int(np.log(10000*stt_magnitude)*300)):
             simulation.PlayPause(p_state, "LLG", "SIB", n_iterations=1000)
             spins = system.Get_Spin_Directions( p_state, idx_chain=-1)
 
-            if i == 0 or i == int(np.log(10000*stt_magnitude)*250)-1:
+            if i == 0 or i == int(np.log(10000*stt_magnitude)*300)-1:
                 filename2 = directory+"/"+'Spins'+str(i)
                 np.savetxt(filename2, spins)
                 # f2 = open(filename2, 'w')
