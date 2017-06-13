@@ -32,6 +32,8 @@ namespace Data
 		scalar temperature;
 		// Damping
 		scalar damping;
+		//
+		scalar beta;
 		// Time step per iteration
 		scalar dt;
 		// whether to renormalize spins after every SD iteration

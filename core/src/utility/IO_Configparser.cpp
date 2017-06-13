@@ -308,6 +308,8 @@ namespace Utility
 			scalar temperature = 0.0;
 			// Damping constant
 			scalar damping = 0.5;
+			//
+			scalar beta = 0.0;
 			// iteration time step
 			scalar dt = 1.0E-02;
 			// Whether to renormalize spins after every SD iteration
@@ -342,6 +344,7 @@ namespace Utility
 					myfile.Read_Single(temperature, "llg_temperature");
 					myfile.Read_Single(damping, "llg_damping");
 					myfile.Read_Single(dt, "llg_dt");
+					myfile.Read_Single(beta, "llg_beta");
 					// dt = time_step [ps] * 10^-12 * gyromagnetic raio / mu_B  { / (1+damping^2)} <- not implemented
 					dt = dt*std::pow(10, -12) / Constants::mu_B*1.760859644*std::pow(10, 11);
 					myfile.Read_Single(renorm_sd, "llg_renorm");
@@ -386,6 +389,7 @@ namespace Utility
 			auto llg_params = std::unique_ptr<Data::Parameters_Method_LLG>(new Data::Parameters_Method_LLG( output_folder, {output_any, output_initial, output_final, output_energy_single, output_energy_archive, output_energy_spin_resolved,
 				output_energy_divide_by_nspins, output_configuration_single, output_configuration_archive}, force_convergence, n_iterations, n_iterations_log, seed, temperature, damping, dt, renorm_sd, stt_magnitude, stt_polarisation_normal));
 			Log(Log_Level::Info, Log_Sender::IO, "Parameters LLG: built");
+			llg_params->beta = beta;
 			return llg_params;
 		}// end Parameters_Method_LLG_from_Config
 
