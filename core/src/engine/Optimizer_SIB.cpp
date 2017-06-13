@@ -60,14 +60,14 @@ namespace Engine
 		//========================= Init local vars ================================
 		// time steps
 		scalar damping = llg_params.damping;
-		scalar sqrtdt = std::sqrt(llg_params.dt/(1+std::pow(damping, 2)); // is this correct for the thermal term? or should it be sqrt(dt)/(1+dampin^2)
-		dtg = llg_params.dt/(1+std::pow(damping, 2));
-		sqrtdtg = sqrtdt;
+		scalar sqrtdt = std::sqrt(llg_params.dt/(1+std::pow(damping, 2))); // is this correct for the thermal term? or should it be sqrt(dt)/(1+dampin^2)
+		scalar dtg = llg_params.dt/(1+std::pow(damping, 2));
+		scalar sqrtdtg = sqrtdt;
 		// STT
 		scalar a_j = llg_params.stt_magnitude;
 		Vector3 s_c_vec = llg_params.stt_polarisation_normal; 
 		//STT gradient
-		bool gradON = false;
+		bool gradON = true;
 		scalar b_j = 1.0;
 		scalar beta = llg_params.beta;
 		Vector3 je = { 1,0,0 };
