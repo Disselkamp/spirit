@@ -60,7 +60,7 @@ namespace Engine
 		//========================= Init local vars ================================
 		// time steps
 		scalar damping = llg_params.damping;
-		scalar sqrtdt = std::sqrt(llg_params.dt/(1+std::pow(damping, 2))); // is this correct for the thermal term? or should it be sqrt(dt)/(1+dampin^2)
+		scalar sqrtdt = std::sqrt(llg_params.dt)/(1+std::pow(damping, 2)); // is this correct for the thermal term? 
 		scalar dtg = llg_params.dt/(1+std::pow(damping, 2));
 		scalar sqrtdtg = sqrtdt;
 		// STT
@@ -93,7 +93,7 @@ namespace Engine
 			Vectormath::gradient   (spins, hamiltonian, geometry, je, s_c_grad); // s_c_grad = (j_e*grad)*S
 			Vectormath::add_c_a    ( -0.5 * dtg * a_j * ( damping - beta ), s_c_grad, force); //a_j durch b_j ersetzen 
 			Vectormath::add_c_cross( -0.5 * dtg * a_j * ( 1 + beta * damping ), s_c_grad, spins, force); //a_j durch b_j ersetzen 
-			// Gradient in current richtung => *(-1)
+			// Gradient in current richtung, daher => *(-1)
 		}
 
 		// Temperature
