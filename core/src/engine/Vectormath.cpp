@@ -400,54 +400,49 @@ namespace Engine
 
 			std::vector<bool> boundary_conditions = hamiltonian.boundary_conditions;
 
-			Vector3 a = geometry.translation_vectors[0];
+			Vector3 a = geometry.translation_vectors[0]; // translation vectors of the system
 			Vector3 b = geometry.translation_vectors[1];
 			Vector3 c = geometry.translation_vectors[2];
 
-			// TODO: calculate Neighbours before iterations
 			Neighbourfield neigh;
+
+			// TODO: calculate Neighbours outside iterations
 			// Neighbours::get_Neighbours(geometry, neigh);
+
+            // Hardcoded neighbours - for spin current in x-direction (for chain-/quadratic-/cubic-lattice)
 			neigh = Neighbourfield(0);
 			neigh.push_back(std::vector< Neighbour > (0));
 			neigh[0].push_back({ 0, {1.0, 0.0, 0.0} }); 
 			neigh[0].push_back({ 0, {-1.0, 0.0, 0.0} });
-			// std::cout << "Neighbours: " << neigh[k][j].jatom << " " << neigh[k][j].translations[0]
 
 			Vector3  diffq, diffqx, diffqy, diffqz;
 
 			for(unsigned int i = 0; i < spins.size(); ++i)
 			{
-				auto translations_i = translations_from_idx(n_cells, geometry.n_spins_basic_domain, i);
-				int k = i%geometry.n_spins_basic_domain;
+				auto translations_i = translations_from_idx(n_cells, geometry.n_spins_basic_domain, i); // transVec of spin i
+				int k = i%geometry.n_spins_basic_domain; // index within unit cell - k=0 for all cases used in the thesis
 				double n = 0;
+
 				for(unsigned int j = 0; j < neigh[k].size(); ++j)
 				{
 					std::array<int,3> neightranslation;
-					neightranslation[0] = neigh[k][j].translations[0]; neightranslation[1] = neigh[k][j].translations[1]; neightranslation[2] = neigh[k][j].translations[2];
+					neightranslation[0] = neigh[k][j].translations[0];
+                    neightranslation[1] = neigh[k][j].translations[1];
+                    neightranslation[2] = neigh[k][j].translations[2];
+
 					if ( boundary_conditions_fulfilled(geometry.n_cells, boundary_conditions, translations_i, neightranslation) )
 					{
-						Vector3 translationVec3 = geometry.basis_atoms[neigh[k][j].jatom] - geometry.basis_atoms[k] + neigh[k][j].translations[0]*a + neigh[k][j].translations[1]*b + neigh[k][j].translations[2]*c; // -geometry.basis_atoms[k]
-						// std::array<int,3> translation;
-						// translation[0] = (int)translationVec3[0]; translation[1] = (int)translationVec3[1]; translation[2] = (int)translationVec3[2];
-						int idx = idx_from_translations(n_cells, geometry.n_spins_basic_domain, translations_i, neightranslation);
+						 Vector3 translationVec3 = neightranslation[0]*a + neightranslation[1]*b + neightranslation[2]*c; 
+                        // add "+ geometry.basis_atoms[neigh[k][j].jatom] - geometry.basis_atoms[k]" for unit cells with >1atom ? 
+
+						int idx = idx_from_translations(n_cells, geometry.n_spins_basic_domain, translations_i, neightranslation); // index of neighbour
 						
-						// std::cout << "i: " << i << "  j: " << j << "  idx: " << idx << std::endl;
-						// std::cout << "neighbours   " << " : ";
-						// std::cout << neigh[k][j].jatom << " ," << neigh[k][j].translations[0] << " ," << neigh[k][j].translations[1] << " ," << neigh[k][j].translations[2] << std::endl; 
-						// std::cout << "translations " << i << j << " : ";
-						// std::cout << neightranslation[0] << " ," << neightranslation[1] << " ," << neightranslation[2] << std::endl;
+						diffq = (spins[idx]-spins[i])/translationVec3.norm(); // difference quotient in direction of the neighbour
 
-						diffq = (spins[idx]-spins[i])/translationVec3.norm();
-
-						// std::cout << "Spin[i]: " << spins[i][0] << " " << spins[i][1] << " " << spins[i][2] 
-						// << " Spin[idx]: " << spins[idx][0] << " " << spins[idx][1] << " " << spins[idx][2] << std::endl;
-
-						// std::cout << "translvec: " << translationVec3[0] << std::endl;
-
-						diffqx += translationVec3[0]*diffq;
+						diffqx += translationVec3[0]*diffq; // projection of difference quotient in euclidian space
 						diffqy += translationVec3[1]*diffq;
 						diffqz += translationVec3[2]*diffq;
-						n += 1.0; // 1 fuer Aussen-Spins entsprechend boundary conditions sonst 2
+						n += 1.0; // boundary conditions considered
 					}
 				}
 
@@ -503,48 +498,6 @@ namespace Engine
 				(boundary_conditions[1] || (0 <= db && db < n_cells[1])) &&
 				(boundary_conditions[2] || (0 <= dc && dc < n_cells[2])));
 		}
-
-		// index from translationvector and vise versa
-		// inline int idx_from_translations(const std::vector<int> & n_cells, int n_spins_basic_domain, const Vector3 & translations_i, const Vector3 & translations)
-		// {
-		// 	int Na = n_cells[0];
-		// 	int Nb = n_cells[1];
-		// 	int Nc = n_cells[2];
-		// 	int N  = n_spins_basic_domain;
-
-		// 	int da = translations_i[0]+translations[0];
-		// 	int db = translations_i[1]+translations[1];
-		// 	int dc = translations_i[2]+translations[2];
-
-		// 	if (translations[0] < 0)
-		// 		da += N*Na;
-		// 	if (translations[1] < 0)
-		// 		db += N*Na*Nb;
-		// 	if (translations[2] < 0)
-		// 		dc += N*Na*Nb*Nc;
-				
-		// 	int idx = (da%Na)*N + (db%Nb)*N*Na + (dc%Nc)*N*Na*Nb;
-			
-		// 	return idx;
-		// }
-		// inline intfield translations_from_idx(const std::vector<int> & n_cells, int n_spins_basic_domain, int idx)
-		// {
-		// 	// spin_pos[idx]
-		// 	std::cout << "idx: " << idx << std::endl;
-
-		// 	intfield ret;
-		// 	int Na = n_cells[0];
-		// 	int Nb = n_cells[1];
-		// 	int Nc = n_cells[2];
-		// 	int N  = n_spins_basic_domain;
-		// 	ret[2] = idx/(Na*Nb);
-		// 	ret[1] = (idx-ret[2]*Na*Nb)/Na;
-		// 	ret[0] = idx-ret[2]*Na*Nb-ret[1]*Na;
-		
-		// 	std::cout << "ret: " << ret[0] << " " << ret[1] << " " << ret[2] << std::endl;
-		
-		// 	return ret;
-		// }
 	}
 }
 

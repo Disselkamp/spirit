@@ -67,10 +67,11 @@ namespace Engine
 		scalar a_j = llg_params.stt_magnitude;
 		Vector3 s_c_vec = llg_params.stt_polarisation_normal; 
 		//STT gradient
-		bool gradON = true;
-		scalar b_j = 1.0;
-		scalar beta = llg_params.beta;
-		Vector3 je = { 1,0,0 };
+        // hardcoded parameters
+		bool gradON = true; // switch between STT methods
+		scalar b_j = 1.0;   // pre-factor b_j = u*mu_s/gamma (see bachelorthesis Constantin)
+		scalar beta = llg_params.beta;  // non-adiabatic parameter of correction term
+		Vector3 je = { 1,0,0 }; // direction of current
 		vectorfield s_c_grad;
 		//------------------------ End Init ----------------------------------------
 
@@ -91,8 +92,8 @@ namespace Engine
 		if (a_j > 0 && gradON == true)
 		{
 			Vectormath::gradient   (spins, hamiltonian, geometry, je, s_c_grad); // s_c_grad = (j_e*grad)*S
-			Vectormath::add_c_a    ( -0.5 * dtg * a_j * ( damping - beta ), s_c_grad, force); //a_j durch b_j ersetzen 
-			Vectormath::add_c_cross( -0.5 * dtg * a_j * ( 1 + beta * damping ), s_c_grad, spins, force); //a_j durch b_j ersetzen 
+			Vectormath::add_c_a    ( -0.5 * dtg * a_j * ( damping - beta ), s_c_grad, force); // TODO: a_j durch b_j ersetzen 
+			Vectormath::add_c_cross( -0.5 * dtg * a_j * ( 1 + beta * damping ), s_c_grad, spins, force); // TODO: a_j durch b_j ersetzen 
 			// Gradient in current richtung, daher => *(-1)
 		}
 
