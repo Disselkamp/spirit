@@ -25,6 +25,7 @@ from spirit import quantities
 from spirit import io
 from spirit import log
 from spirit import hamiltonian
+from spirit import parameters
 
 cfgfile = "input/schieback_displacement.cfg"
 
@@ -40,9 +41,9 @@ with state.State(cfgfile) as p_state:
         io.Image_Read(p_state, filename, fileformat=0, idx_image=-1, idx_chain=-1)
 
         print "STT_magnitude: %.3f"%round(stt_magnitude, 3)
-        hamiltonian.Set_STT(p_state, stt_magnitude, [1.0,0.0,0.0], idx_image=-1, idx_chain=-1)
+        parameters.llg.setSTT(p_state, True, stt_magnitude, [1.0,0.0,0.0], idx_image=-1, idx_chain=-1)
 
-        directory = "output/%.3f"%stt_magnitude
+        directory = "output/schieback_displacement/%.3f"%stt_magnitude
         if not os.path.exists(directory):
             os.makedirs(directory)
 
