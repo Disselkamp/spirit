@@ -232,7 +232,12 @@ namespace Engine
             }
         }
 
-        
+        const pairfield pairs = pairfield{
+            Pair{0, 0, {1,0,0}},
+            Pair{0, 0, {-1,0,0}},
+            Pair{0, 0, {0,1,0}},
+            Pair{0, 0, {0,-1,0}}
+        };
         void directional_gradient(const vectorfield & vf, const Data::Geometry & geometry, const intfield & boundary_conditions, const Vector3 & direction, vectorfield & gradient)
         {
             // std::cout << "start gradient" << std::endl;
@@ -242,49 +247,6 @@ namespace Engine
             Vector3 a = geometry.translation_vectors[0]; // translation vectors of the system
             Vector3 b = geometry.translation_vectors[1];
             Vector3 c = geometry.translation_vectors[2];
-
-            neighbourfield neigh;
-
-            // TODO: calculate Neighbours outside iterations
-            // Neighbours::get_Neighbours(geometry, neigh);
-
-            // TODO: proper usage of neighbours
-            // Hardcoded neighbours - for spin current in a rectangular lattice
-            neigh = neighbourfield(0);
-            Neighbour neigh_tmp;
-            neigh_tmp.i = 0;
-            neigh_tmp.j = 0;
-            neigh_tmp.idx_shell = 0;
-
-            neigh_tmp.translations[0] = 1;
-            neigh_tmp.translations[1] = 0;
-            neigh_tmp.translations[2] = 0;
-            neigh.push_back(neigh_tmp);
-
-            neigh_tmp.translations[0] = -1;
-            neigh_tmp.translations[1] = 0;
-            neigh_tmp.translations[2] = 0;
-            neigh.push_back(neigh_tmp);
-
-            neigh_tmp.translations[0] = 0;
-            neigh_tmp.translations[1] = 1;
-            neigh_tmp.translations[2] = 0;
-            neigh.push_back(neigh_tmp);
-
-            neigh_tmp.translations[0] = 0;
-            neigh_tmp.translations[1] = -1;
-            neigh_tmp.translations[2] = 0;
-            neigh.push_back(neigh_tmp);
-
-            neigh_tmp.translations[0] = 0;
-            neigh_tmp.translations[1] = 0;
-            neigh_tmp.translations[2] = 1;
-            neigh.push_back(neigh_tmp);
-
-            neigh_tmp.translations[0] = 0;
-            neigh_tmp.translations[1] = 0;
-            neigh_tmp.translations[2] = -1;
-            neigh.push_back(neigh_tmp);
 
             // Loop over vectorfield
             for(unsigned int ispin = 0; ispin < vf.size(); ++ispin)
@@ -303,12 +265,12 @@ namespace Engine
                 // TODO: both loops together.
 
                 // Loop over neighbours of this vector to calculate contributions of finite differences to current direction
-                for(unsigned int j = 0; j < neigh.size(); ++j)
+                for(unsigned int j = 0; j < pairs.size(); ++j)
                 {
-                    if ( boundary_conditions_fulfilled(geometry.n_cells, boundary_conditions, translations_i, neigh[j].translations) )
+                    if ( boundary_conditions_fulfilled(geometry.n_cells, boundary_conditions, translations_i, pairs[j].translations) )
                     {
                         // Index of neighbour
-                        int ineigh = idx_from_translations(n_cells, geometry.n_spins_basic_domain, translations_i, neigh[j].translations);
+                        int ineigh = idx_from_translations(n_cells, geometry.n_spins_basic_domain, translations_i, pairs[j].translations);
                         if (ineigh >= 0)
                         {
                             auto d = geometry.spin_pos[ineigh] - geometry.spin_pos[ispin];
@@ -325,12 +287,12 @@ namespace Engine
                         projection_inv[dim] = 1.0/proj[dim];
                 }
                 // Loop over neighbours of this vector to calculate finite differences
-                for(unsigned int j = 0; j < neigh.size(); ++j)
+                for(unsigned int j = 0; j < pairs.size(); ++j)
                 {
-                    if ( boundary_conditions_fulfilled(geometry.n_cells, boundary_conditions, translations_i, neigh[j].translations) )
+                    if ( boundary_conditions_fulfilled(geometry.n_cells, boundary_conditions, translations_i, pairs[j].translations) )
                     {
                         // Index of neighbour
-                        int ineigh = idx_from_translations(n_cells, geometry.n_spins_basic_domain, translations_i, neigh[j].translations);
+                        int ineigh = idx_from_translations(n_cells, geometry.n_spins_basic_domain, translations_i, pairs[j].translations);
                         if (ineigh >= 0)
                         {
                             auto d = geometry.spin_pos[ineigh] - geometry.spin_pos[ispin];
