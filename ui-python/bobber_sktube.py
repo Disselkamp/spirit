@@ -19,11 +19,11 @@ import time
 from spirit import state, system, geometry, chain, configuration, transition, simulation, quantities, io, log, hamiltonian, parameters
 
 
-if len(sys.argv) < 4: sys.exit("execute with: 1) beta (eg. 0.00); 2) cfgfile (eg. \"input/12x12x7_b0.00.cfg\"); 3) stt_magnitudes (eg. 0.025 0.050 0.100 0.150)")  # abort if not enough arguments are given
+if len(sys.argv) < 4: sys.exit("execute with: 1) beta (eg. 0.00); 2) cfgfile (eg. \"12x12x7_b0.00\" has to be in /input); 3) stt_magnitudes (eg. 0.025 0.050 0.100 0.150)")  # abort if not enough arguments are given
 beta = float(sys.argv[1])
 cfgfile = sys.argv[2]
 
-with state.State(cfgfile) as p_state:
+with state.State("input/"+cfgfile+".cfg") as p_state:
 
     for stt_magnitude in [ float(i) for i in sys.argv[3:] ]:  # read stt magnitude from terminal input
 
@@ -45,7 +45,7 @@ with state.State(cfgfile) as p_state:
         print("STT_magnitude: %.3f"%round(stt_magnitude, 3))
 
         # create directory for output files
-        directory = "output/beta_%.2f/stt_%.3f"%(beta, stt_magnitude)
+        directory = "output/"+cfgfile+"/beta_%.2f/stt_%.3f"%(beta, stt_magnitude)
         if not os.path.exists(directory): os.makedirs(directory)
 
         # file for position data
