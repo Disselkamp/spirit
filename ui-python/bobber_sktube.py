@@ -31,14 +31,20 @@ with state.State("input/"+cfgfile+".cfg") as p_state:
         configuration.PlusZ(p_state, pos=[0.0,0.0,0.0], border_rectangular=[-1.0,-1.0,-1.0], border_cylindrical=-1.0, border_spherical=-1.0, inverted=False, idx_image=-1, idx_chain=-1)
         print("PlusZ")
 
+        # Add Noise
+        configuration.Add_Noise_Temperature(p_state, 5, pos=[0,0,0], border_rectangular=[-1,-1,-1], 
+                          border_cylindrical=-1, border_spherical=-1, inverted=False, 
+                          idx_image=-1, idx_chain=-1)
+        print("Noise added")
+
         # deploy skyrmiontube/bobber
         radius = 5  # radius of skyrmiontube/bobber
         configuration.Skyrmion(p_state, radius, order=1, phase=0, upDown=False, achiral=False, rightleft=True, pos=[0,0,4], border_rectangular=[-1,-1,-1], border_cylindrical=-1, border_spherical=3, inverted=False, idx_image=-1, idx_chain=-1)  # position has to change according to system size
-        print("Bobber/Skyrmion initiated")
+        print("Bobber/SkyrmionT initiated")
 
         # relax the system with SIB (no skyrmion/bobber with VP)
-        simulation.PlayPause(p_state, "LLG", "SIB", n_iterations=4000)
-        print("Bobber/Skyrmion relaxed")
+        simulation.PlayPause(p_state, "LLG", "SIB", n_iterations=16000)
+        print("Bobber/SkyrmionT relaxed")
 
         # set current in x-direction (True = gradient method)
         parameters.llg.setSTT(p_state, True, stt_magnitude, [1.0,0.0,0.0], idx_image=-1, idx_chain=-1)
