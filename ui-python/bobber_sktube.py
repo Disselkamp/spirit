@@ -45,7 +45,7 @@ with state.State("input/"+cfgfile+".cfg") as p_state:
         np.savetxt("bobber_configuration.txt",system.Get_Spin_Directions(p_state, idx_chain=-1))
 
         # relax the system with SIB (no skyrmion/bobber with VP)
-        simulation.PlayPause(p_state, "LLG", "SIB", n_iterations=16000)
+        simulation.PlayPause(p_state, "LLG", "VP", n_iterations=16000)
         print("Bobber/SkyrmionT relaxed")
 
         np.savetxt("relaxed_configuration.txt",system.Get_Spin_Directions(p_state, idx_chain=-1))
