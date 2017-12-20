@@ -42,9 +42,13 @@ with state.State("input/"+cfgfile+".cfg") as p_state:
         configuration.Skyrmion(p_state, radius, order=1, phase=0, upDown=False, achiral=False, rightleft=True, pos=[0,0,4], border_rectangular=[-1,-1,-1], border_cylindrical=-1, border_spherical=3, inverted=False, idx_image=-1, idx_chain=-1)  # position has to change according to system size
         print("Bobber/SkyrmionT initiated")
 
+        np.savetxt("bobber_configuration.txt",system.Get_Spin_Directions(p_state, idx_chain=-1))
+
         # relax the system with SIB (no skyrmion/bobber with VP)
         simulation.PlayPause(p_state, "LLG", "SIB", n_iterations=16000)
         print("Bobber/SkyrmionT relaxed")
+
+        np.savetxt("relaxed_configuration.txt",system.Get_Spin_Directions(p_state, idx_chain=-1))
 
         # set current in x-direction (True = gradient method)
         parameters.llg.setSTT(p_state, True, stt_magnitude, [1.0,0.0,0.0], idx_image=-1, idx_chain=-1)
