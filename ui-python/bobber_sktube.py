@@ -19,13 +19,15 @@ import time
 from spirit import state, system, geometry, chain, configuration, transition, simulation, quantities, io, log, hamiltonian, parameters
 
 
-if len(sys.argv) < 4: sys.exit("execute with: 1) beta (eg. 0.00); 2) cfgfile (eg. \"12x12x7_b0.00\" has to be in /input); 3) stt_magnitudes (eg. 0.025 0.050 0.100 0.150)")  # abort if not enough arguments are given
+if len(sys.argv) < 4: sys.exit("execute with: 1) beta (eg. 0.00); 2) cfgfile (eg. \"12x12x7_b0.00\" has to be in /input); 3)N (number of Spins NxNxL); 4)borderspherical (eg. 3 (-1 = SkyrmionTube))  5) stt_magnitudes (eg. 0.025 0.050 0.100 0.150)")  # abort if not enough arguments are given
 beta = float(sys.argv[1])
 cfgfile = sys.argv[2]
+N = float(sys.arg[3])
+borderspherical = float(sys.argv[4])
 
 with state.State("input/"+cfgfile+".cfg") as p_state:
 
-    for stt_magnitude in [ float(i) for i in sys.argv[3:] ]:  # read stt magnitude from terminal input
+    for stt_magnitude in [ float(i) for i in sys.argv[5:] ]:  # read stt magnitude from terminal input
 
         # Plus Z
         configuration.PlusZ(p_state, pos=[0.0,0.0,0.0], border_rectangular=[-1.0,-1.0,-1.0], border_cylindrical=-1.0, border_spherical=-1.0, inverted=False, idx_image=-1, idx_chain=-1)
@@ -39,7 +41,7 @@ with state.State("input/"+cfgfile+".cfg") as p_state:
 
         # deploy skyrmiontube/bobber
         radius = 5  # radius of skyrmiontube/bobber
-        configuration.Skyrmion(p_state, radius, order=1, phase=0, upDown=False, achiral=False, rightleft=True, pos=[0,0,4], border_rectangular=[-1,-1,-1], border_cylindrical=-1, border_spherical=3, inverted=False, idx_image=-1, idx_chain=-1)  # position has to change according to system size
+        configuration.Skyrmion(p_state, radius, order=1, phase=0, upDown=False, achiral=False, rightleft=True, pos=[0,0,4], border_rectangular=[-1,-1,-1], border_cylindrical=-1, border_spherical=borderspherical, inverted=False, idx_image=-1, idx_chain=-1)  # position has to change according to system size
         print("Bobber/SkyrmionT initiated")
 
         np.savetxt("bobber_configuration.txt",system.Get_Spin_Directions(p_state, idx_chain=-1))
@@ -68,10 +70,10 @@ with state.State("input/"+cfgfile+".cfg") as p_state:
         for i in range(0, steps):
             
             spins = system.Get_Spin_Directions(p_state, idx_chain=-1)  # spin directions
-            m = min([spin[2] for spin in spins[-144:]])  # find spin with smallest z-component (of spins lying in the +z-surface 12*12=144)
+            m = min([spin[2] for spin in spins[-N*N:]])  # find spin with smallest z-component (of spins lying in the +z-surface 12*12=144)
 
-            for j in range(0, len(spins[-144:])):  # search and save position of the skyrmiontube/bobber
-                if spins[j-144][2] == m:
+            for j in range(0, len(spins[-N*N:])):  # search and save position of the skyrmiontube/bobber
+                if spins[j-N*N][2] == m:
                     print(j)
                     file_positions.write('\n'+str(i)+'    '+str(j))
             
