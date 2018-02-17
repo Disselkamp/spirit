@@ -54,14 +54,14 @@ with state.State("input/"+cfgfile+".cfg") as p_state:
 
         # set current in x-direction (True = gradient method)
         parameters.llg.setSTT(p_state, True, stt_magnitude, [1.0,0.0,0.0], idx_image=-1, idx_chain=-1)
-        print("STT_magnitude: %.3f"%round(stt_magnitude, 3))
+        print("STT_magnitude: %.4f"%round(stt_magnitude, 4))
 
         # create directory for output files
-        directory = "output/"+cfgfile+"/beta_%.2f/stt_%.3f"%(beta, stt_magnitude)
+        directory = "output/"+cfgfile+"/beta_%.2f/stt_%.4f"%(beta, stt_magnitude)
         if not os.path.exists(directory): os.makedirs(directory)
 
         # file for position data
-        filename1 = directory+"/"+'positions_STTmagn%.3f'%stt_magnitude
+        filename1 = directory+"/"+'positions_STTmagn%.4f'%stt_magnitude
         file_positions = open(filename1, 'w')
         file_positions.write('Step    Position')
 
