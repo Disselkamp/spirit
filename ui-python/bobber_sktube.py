@@ -77,7 +77,7 @@ with state.State("input/"+cfgfile+".cfg") as p_state:
                     print(j)
                     file_positions.write('\n'+str(i)+'    '+str(j))
             
-            if i%10 == 0 or i == steps-1:  # save spin directions every 10 steps and the last
+            if i%100 == 0 or i == steps-1:  # save spin directions every 10 steps and the last
                 filename2 = directory+"/"+'Spins'+str(i)+'.txt'
                 np.savetxt(filename2, spins)
 
