@@ -22,7 +22,11 @@ from spirit import state, system, geometry, chain, configuration, transition, si
 if len(sys.argv) < 4: sys.exit("execute with: 1) beta (eg. 0.00); 2) cfgfile (eg. \"12x12x7_b0.00\" has to be in /input); 3)N (number of Spins NxNxL); 4)borderspherical (eg. 3 (-1 = SkyrmionTube))  5) stt_magnitudes (eg. 0.025 0.050 0.100 0.150)")  # abort if not enough arguments are given
 beta = float(sys.argv[1])
 cfgfile = sys.argv[2]
+<<<<<<< HEAD
 N = float(sys.argv[3])
+=======
+N = int(sys.argv[3])
+>>>>>>> 1197ac89147f8ecfd2a1d697452a8eb1d90a3d42
 borderspherical = float(sys.argv[4])
 
 with state.State("input/"+cfgfile+".cfg") as p_state:
@@ -54,14 +58,14 @@ with state.State("input/"+cfgfile+".cfg") as p_state:
 
         # set current in x-direction (True = gradient method)
         parameters.llg.setSTT(p_state, True, stt_magnitude, [1.0,0.0,0.0], idx_image=-1, idx_chain=-1)
-        print("STT_magnitude: %.3f"%round(stt_magnitude, 3))
+        print("STT_magnitude: %.4f"%round(stt_magnitude, 4))
 
         # create directory for output files
-        directory = "output/"+cfgfile+"/beta_%.2f/stt_%.3f"%(beta, stt_magnitude)
+        directory = "output/"+cfgfile+"/beta_%.2f/stt_%.4f"%(beta, stt_magnitude)
         if not os.path.exists(directory): os.makedirs(directory)
 
         # file for position data
-        filename1 = directory+"/"+'positions_STTmagn%.3f'%stt_magnitude
+        filename1 = directory+"/"+'positions_STTmagn%.4f'%stt_magnitude
         file_positions = open(filename1, 'w')
         file_positions.write('Step    Position')
 
