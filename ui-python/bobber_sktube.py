@@ -30,6 +30,11 @@ for line in open("input/"+cfgfile+".cfg"):
     if 'llg_beta' in line:
         beta = float(line.split('\t')[-1])
 
+# save used cfg file to folder
+directory0 = "output/"+cfgfile
+if not os.path.exists(directory0): os.makedirs(directory0)
+open(directory0+"/"+cfgfile+".cfg", 'w').write(open("input/"+cfgfile+".cfg").read())
+
 with state.State("input/"+cfgfile+".cfg") as p_state:
 
     for stt_magnitude in [ float(i) for i in sys.argv[4:] ]:  # read stt magnitude from terminal input
