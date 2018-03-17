@@ -19,15 +19,29 @@ import time
 from spirit import state, system, geometry, chain, configuration, transition, simulation, quantities, io, log, hamiltonian, parameters
 
 
-if len(sys.argv) < 4: sys.exit("execute with: 1) beta (eg. 0.00); 2) cfgfile (eg. \"12x12x7_b0.00\" has to be in /input); 3)N (number of Spins NxNxL); 4)borderspherical (eg. 3 (-1 = SkyrmionTube))  5) stt_magnitudes (eg. 0.025 0.050 0.100 0.150)")  # abort if not enough arguments are given
-beta = float(sys.argv[1])
-cfgfile = sys.argv[2]
-N = int(sys.argv[3])
-borderspherical = float(sys.argv[4])
+if len(sys.argv) < 3: sys.exit("execute with: 1) cfgfile (eg. \"12x12x7_b0.00\" has to be in /input); 2) N (number of Spins NxNxL); 3) borderspherical (eg. 3 (-1 = SkyrmionTube))  4) stt_magnitudes (eg. 0.025 0.050 0.100 0.150)")  # abort if not enough arguments are given
+# beta = float(sys.argv[1])
+cfgfile = sys.argv[1]
+N = int(sys.argv[2])
+borderspherical = float(sys.argv[3])
+
+# get beta from cfg file
+for line in open("input/"+cfgfile+".cfg"):
+    if 'llg_beta' in line:
+        beta = float(line.split('\t')[-1])
+
+# save used cfg file to folder
+directory0 = "output/"+cfgfile
+if not os.path.exists(directory0): os.makedirs(directory0)
+open(directory0+"/"+cfgfile+".cfg", 'w').write(open("input/"+cfgfile+".cfg").read())
 
 with state.State("input/"+cfgfile+".cfg") as p_state:
 
-    for stt_magnitude in [ float(i) for i in sys.argv[5:] ]:  # read stt magnitude from terminal input
+    for stt_magnitude in [ float(i) for i in sys.argv[4:] ]:  # read stt magnitude from terminal input
+
+        # create directory for output files
+        directory = "output/"+cfgfile+"/beta_%.2f/stt_%.4f"%(beta, stt_magnitude)
+        if not os.path.exists(directory): os.makedirs(directory)
 
         # Plus Z
         configuration.PlusZ(p_state, pos=[0.0,0.0,0.0], border_rectangular=[-1.0,-1.0,-1.0], border_cylindrical=-1.0, border_spherical=-1.0, inverted=False, idx_image=-1, idx_chain=-1)
@@ -44,21 +58,17 @@ with state.State("input/"+cfgfile+".cfg") as p_state:
         configuration.Skyrmion(p_state, radius, order=1, phase=0, upDown=False, achiral=False, rightleft=True, pos=[0,0,4], border_rectangular=[-1,-1,-1], border_cylindrical=-1, border_spherical=borderspherical, inverted=False, idx_image=-1, idx_chain=-1)  # position has to change according to system size
         print("Bobber/SkyrmionT initiated")
 
-        np.savetxt("bobber_configuration.txt",system.Get_Spin_Directions(p_state, idx_chain=-1))
+        np.savetxt(directory+"/bobber_configuration.txt",system.Get_Spin_Directions(p_state, idx_chain=-1))
 
         # relax the system with SIB (no skyrmion/bobber with VP)
         simulation.PlayPause(p_state, "LLG", "VP", n_iterations=16000)
         print("Bobber/SkyrmionT relaxed")
 
-        np.savetxt("relaxed_configuration.txt",system.Get_Spin_Directions(p_state, idx_chain=-1))
+        np.savetxt(directory+"/relaxed_configuration.txt",system.Get_Spin_Directions(p_state, idx_chain=-1))
 
         # set current in x-direction (True = gradient method)
         parameters.llg.setSTT(p_state, True, stt_magnitude, [1.0,0.0,0.0], idx_image=-1, idx_chain=-1)
         print("STT_magnitude: %.4f"%round(stt_magnitude, 4))
-
-        # create directory for output files
-        directory = "output/"+cfgfile+"/beta_%.2f/stt_%.4f"%(beta, stt_magnitude)
-        if not os.path.exists(directory): os.makedirs(directory)
 
         # file for position data
         filename1 = directory+"/"+'positions_STTmagn%.4f'%stt_magnitude
