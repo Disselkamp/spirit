@@ -76,7 +76,7 @@ with state.State("input/"+cfgfile+".cfg") as p_state:
         # file for position data
         filename1 = directory+"/"+'positions_STTmagn%.4f'%stt_magnitude
         file_positions = open(filename1, 'w')
-        file_positions.write('Step    Position')
+        file_positions.write('x-position'+'\t'+'y-position')
         file_positions.close()
 
         npointsx=600
@@ -103,8 +103,8 @@ with state.State("input/"+cfgfile+".cfg") as p_state:
             # plt.plot(grid_x[valx,valy],grid_y[valx,valy],'o', color="white")
             # plt.show()
 
-            file_positions = open(filename1, 'w')
-            file_positions.write('\n'+str(grid_x[valx,valy])+'    '+str(grid_y[valx,valy]))
+            file_positions = open(filename1, 'a')
+            file_positions.write('\n'+str(grid_x[valx,valy][0])+'\t'+str(grid_y[valx,valy][0]))
             file_positions.close()
 
             if i%100 == 0 or i == steps-1:  # save spin directions every 10 steps and the last
