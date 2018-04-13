@@ -93,7 +93,8 @@ with state.State("input/"+cfgfile+".cfg") as p_state:
             spins_z = spins[:,2]
             grid_z = interpolate.griddata(points, spins_z, (grid_x, grid_y), method='cubic')
             minima = (grid_z == ndimage.minimum_filter(grid_z, 8))
-            valx,valy = np.nonzero(minima)
+            globalminima = min(minima)
+            valx,valy = np.nonzero(globalminima)
 
             for ki in range(valx.shape[0]-1,-1,-1):
                 if (grid_z[valx[ki],valy[ki]] > -0.8):
