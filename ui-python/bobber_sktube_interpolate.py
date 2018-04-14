@@ -92,19 +92,25 @@ with state.State("input/"+cfgfile+".cfg") as p_state:
             spins = system.Get_Spin_Directions(p_state, idx_image=-1)[-N*N:]
             spins_z = spins[:,2]
             grid_z = interpolate.griddata(points, spins_z, (grid_x, grid_y), method='cubic')
-            globalminima = (grid_z == min(ndimage.minimum_filter(grid_z, 8)))
-            valx,valy = np.nonzero(globalminima)
+            minima = (grid_z == ndimage.minimum_filter(grid_z, 8))
+            valx,valy = np.nonzero(minima)
 
+	    zt = 0
             for ki in range(valx.shape[0]-1,-1,-1):
                 if (grid_z[valx[ki],valy[ki]] > -0.8):
                         valx = np.delete(valx, ki)
                         valy = np.delete(valy, ki)
+		elif (grid_z[valx[ki], valy[ki]] < zt):
+			zt = grid_z[valx[ki], valy[ki]]
+			xvalue = grid_x[valx[ki],valy[ki]]
+			yvalue = grid_y[valx[ki],valy[ki]]
+
             # plt.imshow(grid_z.T, extent=(bmin[0],bmax[0],bmin[1],bmax[1]), origin='lower', cmap="RdBu")
             # plt.plot(grid_x[valx,valy],grid_y[valx,valy],'o', color="white")
             # plt.show()
 
             file_positions = open(filename1, 'a')
-            file_positions.write('\n'+str(grid_x[valx,valy][0])+'\t'+str(grid_y[valx,valy][0]))
+            file_positions.write('\n'+str(xvalue)+'\t'+str(yvalue))
             file_positions.close()
 
             if i%2000 == 0 or i == steps-1:  # save spin directions every 10 steps and the last
