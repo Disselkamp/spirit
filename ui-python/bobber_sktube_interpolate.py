@@ -86,15 +86,14 @@ with state.State("input/"+cfgfile+".cfg") as p_state:
         positions = geometry.Get_Spin_Positions(p_state)
         points = positions[-N*N:,0:2]
 
-        steps = 500
+        steps = 20000
         for i in range(0, steps):
 
             spins = system.Get_Spin_Directions(p_state, idx_image=-1)
             spins_surf = spins[-N*N:]
             spins_z = spins_surf[:,2]
             grid_z = interpolate.griddata(points, spins_z, (grid_x, grid_y), method='cubic')
-            minima = (grid_z == ndimage.minimum_filter(grid_z, 8))
-            globalminima = min(minima)
+            globalminima = (grid_z == min(ndimage.minimum_filter(grid_z, 8)))
             valx,valy = np.nonzero(globalminima)
 
             for ki in range(valx.shape[0]-1,-1,-1):
@@ -109,7 +108,7 @@ with state.State("input/"+cfgfile+".cfg") as p_state:
             file_positions.write('\n'+str(grid_x[valx,valy][0])+'\t'+str(grid_y[valx,valy][0]))
             file_positions.close()
 
-            if i%100 == 0 or i == steps-1:  # save spin directions every 10 steps and the last
+            if i%2000 == 0 or i == steps-1:  # save spin directions every 10 steps and the last
                 filename2 = directory+"/"+'Spins'+str(i)+'.txt'
                 np.savetxt(filename2, spins)
 
