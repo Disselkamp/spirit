@@ -99,12 +99,12 @@ with state.State("input/"+cfgfile+".cfg") as p_state:
 	    zt = 0
             for ki in range(valx.shape[0]-1,-1,-1):
                 if (grid_z[valx[ki],valy[ki]] > -0.8):
-                        valx = np.delete(valx, ki)
-                        valy = np.delete(valy, ki)
-		elif (grid_z[valx[ki], valy[ki]] < zt):
-			zt = grid_z[valx[ki], valy[ki]]
-			xvalue = grid_x[valx[ki],valy[ki]]
-			yvalue = grid_y[valx[ki],valy[ki]]
+                    valx = np.delete(valx, ki)
+                    valy = np.delete(valy, ki)
+                elif (grid_z[valx[ki], valy[ki]] < zt):
+                    zt = grid_z[valx[ki], valy[ki]]
+                    xvalue = grid_x[valx[ki],valy[ki]]
+                    yvalue = grid_y[valx[ki],valy[ki]]
 
             # plt.imshow(grid_z.T, extent=(bmin[0],bmax[0],bmin[1],bmax[1]), origin='lower', cmap="RdBu")
             # plt.plot(grid_x[valx,valy],grid_y[valx,valy],'o', color="white")
