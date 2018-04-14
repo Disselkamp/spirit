@@ -89,8 +89,9 @@ with state.State("input/"+cfgfile+".cfg") as p_state:
         steps = 20000
         for i in range(0, steps):
 
-            spins = system.Get_Spin_Directions(p_state, idx_image=-1)[-N*N:]
-            spins_z = spins[:,2]
+            spins = system.Get_Spin_Directions(p_state, idx_image=-1)
+            spins_surf = spins[-N*N:]
+            spins_z = spins_surf[:,2]
             grid_z = interpolate.griddata(points, spins_z, (grid_x, grid_y), method='cubic')
             minima = (grid_z == ndimage.minimum_filter(grid_z, 8))
             valx,valy = np.nonzero(minima)
